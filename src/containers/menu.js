@@ -5,16 +5,16 @@ const menu = [
         icon: 'home',
         auth: [1]
     },
-        {
-        title: '老师管理',
+    {
+        title: '用户管理',
         key: '/session-manage',
         icon: 'pie-chart',
         subs: [
-            { title: '老师列表', key: '/teacher-manage/teacher', icon: '' },
+            { title: '用户列表', key: '/teacher-manage/teacher', icon: '' }
             // { title: '群', key: '/session-manage/group', icon: '' },
         ]
-    },
-    
+    }
+
     // {
     //     title: '消息记录',
     //     key: '/message-record',

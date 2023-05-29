@@ -20,7 +20,7 @@
         "redux": "^4.0.4",
         "screenfull": "^5.0.0",
         "yarn": "^1.22.19",
-        "http-proxy-middleware":"^2.0.6"
+        "http-proxy-middleware": "^2.0.6"
     },
     "scripts": {
         "start": "react-app-rewired start",

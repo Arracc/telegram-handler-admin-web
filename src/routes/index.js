@@ -2,7 +2,7 @@ import loadable from '@/utils/loadable'
 
 const Index = loadable(() => import(/* webpackChunkName: 'index' */ '@/views/Index'))
 
-// 老师管理
+// 用户管理
 const TeacherView = loadable(() => import(/* webpackChunkName: 'TeacherView' */ '@/views/TeacherManageView/Teacher'))
 // const GroupView = loadable(() => import(/* webpackChunkName: 'groupView' */ '@/views/TeacherManageView/Group'))
 
@@ -39,7 +39,7 @@ const About = loadable(() => import(/* webpackChunkName: 'about' */ '@/views/Abo
 
 const routes = [
     { path: '/index', exact: true, name: 'Index', component: Index, auth: [1] },
-    { path: '/teacher-manage/teacher', exact: false, name: '老师列表', component: TeacherView, auth: [1] },
+    { path: '/teacher-manage/teacher', exact: false, name: '用户列表', component: TeacherView, auth: [1] },
     // { path: '/teacher-manage/group', exact: false, name: '群', component: GroupView, auth: [1] },
     // { path: '/message-record/undelivered-message', exact: false, name: '未送达消息', component: UndeliveredMessageView, auth: [1] },
 
