@@ -13,12 +13,14 @@ class Root extends Component {
         id: 0
     }
 
-    showInfoCard(data) {
-        this.setState({
-            id: data.id
-        })
+    showInfoCard(id) {
+        if (id != null && id != 0) {
+            this.setState({
+                id: id
+            })
+        }
         // 调用groupMemberTable的显示方法
-        this.InfoCardModal.showModal(data.id)
+        this.InfoCardModal.showModal(id)
     }
 
     render() {
@@ -40,7 +42,11 @@ class Root extends Component {
                 <Row>
                     <Col>
                         <div className='base-style'>
-                            <h3 id='myTable'>用户列表</h3>
+                            {/* <h3 id='myTable'>用户列表</h3> */}
+                            {/* <SearchTable /> */}
+                            <Button type='button' onClick={() => this.showInfoCard(0)}>
+                                新增
+                            </Button>
                             <Divider />
                             <TeacherTable showInfoCard={data => this.showInfoCard(data)} />
                         </div>
@@ -53,15 +59,12 @@ class Root extends Component {
     }
 }
 
-// class CountInfo extends Component {
-//     render() {
-//         return (
-//             <div className='base-style'>
-//                 <h3>在线用户统计</h3>
-//                 <Divider />
-//                 <p>在线用户数：{this.props.userCount}</p>
-//                 <p>在线用户连接数：{this.props.sessionCount}</p>
-//             </div>)
+
+// class SearchTable extends Component {
+//     render(){
+//         return(
+
+//         )
 //     }
 // }
 
@@ -115,7 +118,7 @@ class TeacherTable extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => {})
+            .catch(err => { })
     }
 
     // 渲染数据
@@ -188,7 +191,7 @@ class TeacherTable extends Component {
 
     // 弹出用户连接列表窗口
     edit = record => {
-        this.props.showInfoCard({ id: record.id })
+        this.props.showInfoCard(record.id)
     }
 }
 
@@ -197,12 +200,20 @@ class InfoCardModal extends Component {
         loading: false,
         visible: false,
         id: 0,
-        data: null
+        data: {}
     }
 
     showModal = id => {
-        if (id !== this.state.id) {
-            // 调用InfoCard的queryById方法
+        if (id == 0) {
+            // 新增
+            this.setState({
+                visible: true,
+                id: id,
+                data: {}
+            })
+        }
+        else if (id !== this.state.id) {
+            // 查看详情 调用InfoCard的queryById方法
             console.log('showModal id不一致，将重新查询id:' + id)
             this.setState({
                 loading: true,
@@ -211,6 +222,7 @@ class InfoCardModal extends Component {
             })
             this.queryById(id)
         } else {
+            // 查看详情
             this.setState({
                 visible: true
             })
@@ -252,7 +264,7 @@ class InfoCardModal extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => {})
+            .catch(err => { })
     }
 
     render() {
@@ -286,7 +298,7 @@ class InfoCard extends Component {
     state = {
         loading: false,
         id: 0,
-        data: null
+        data: {}
     }
 
     // 初始化异步数据
@@ -343,15 +355,16 @@ class InfoCard extends Component {
             return <div>页面关闭</div>
         }
 
-        if (!data || loading) {
-            return <div>数据加载失败</div>
-        }
+
+        // if (!data) {
+        //     return <div>数据加载失败</div>
+        // }
 
         if (loading) {
             return <div>数据加载中</div>
         }
 
-        // console.log('visiable:' + this.props.visible + ' 触发渲染:' + JSON.stringify(data))
+        console.log('visiable:' + this.props.visible + ' 触发渲染:' + JSON.stringify(data))
         return (
             <Form {...layout} ref={this.formRef} onSubmit={this.handleSave}>
                 <Form.Item label='ID' name='id'>

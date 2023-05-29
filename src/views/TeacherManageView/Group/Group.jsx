@@ -64,7 +64,7 @@ class Root extends Component {
                 <Row>
                     <Col>
                         <div className='base-style'>
-                            <h3 id='basic'>用户列表</h3>
+                            {/* <h3 id='basic'>用户列表</h3> */}
                             <Divider />
                             <GroupTable
                                 updatePublicData={data => this.updatePublicData(data)}
