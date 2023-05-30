@@ -10,7 +10,14 @@ const { Column } = Table
 
 class Root extends Component {
     state = {
-        id: 0
+        id: 0,
+        search: {
+            nickname: null,
+            username: null,
+            region: null,
+            priceGt: null,
+            priceLt: null
+        }
     }
 
     showInfoCard(id) {
@@ -19,8 +26,22 @@ class Root extends Component {
                 id: id
             })
         }
-        // 调用groupMemberTable的显示方法
+        // 调用InfoCardModal的显示方法
         this.InfoCardModal.showModal(id)
+    }
+
+    handleChange = (fieldName, value) => {
+        const { search } = this.state
+        search[fieldName] = value
+        this.setState({ search })
+    }
+
+    handleSearch = () => {
+        const { search } = this.state
+        const { pagination } = this.TeacherTable.state
+        const { current, pageSize } = pagination
+        console.log(search)
+        this.TeacherTable.queryPage(null, 10, search)
     }
 
     render() {
@@ -29,26 +50,40 @@ class Root extends Component {
                 <div>
                     <CustomBreadcrumb arr={['用户管理', '用户列表']}></CustomBreadcrumb>
                 </div>
-                {/* <CountInfo userCount={this.state.userCount} sessionCount={this.state.sessionCount} /> */}
-
-                <div className='base-style'>
-                    <h3>查找用户</h3>
-                    <Divider />
-                    <span>
-                        <input id='userId'></input>&nbsp;&nbsp;&nbsp;&nbsp;<Button>查找</Button>
-                    </span>
-                </div>
-
                 <Row>
                     <Col>
                         <div className='base-style'>
                             {/* <h3 id='myTable'>用户列表</h3> */}
                             {/* <SearchTable /> */}
-                            <Button type='button' onClick={() => this.showInfoCard(0)}>
-                                新增
-                            </Button>
+                            <div className='base-style'>
+                                <Divider />
+                                <span style={{ display: 'inline-block' }}>
+                                    名字：
+                                    <Input onChange={e => this.handleChange('nickname', e.target.value)} />
+                                </span>
+                                <span style={{ display: 'inline-block' }}>
+                                    用户名：
+                                    <Input onChange={e => this.handleChange('username', e.target.value)} />
+                                </span>
+                                <span style={{ display: 'inline-block' }}>
+                                    地区：
+                                    <Input onChange={e => this.handleChange('region', e.target.value)} />
+                                </span>
+                                <span style={{ display: 'inline-block' }}>
+                                    <Button onClick={this.handleSearch}>查找</Button>
+                                </span>
+                            </div>
+                            <div>
+                                <Button type='button' onClick={() => this.showInfoCard(0)}>
+                                    新增
+                                </Button>
+                            </div>
+
                             <Divider />
-                            <TeacherTable showInfoCard={data => this.showInfoCard(data)} />
+                            <TeacherTable
+                                ref={node => (this.TeacherTable = node)}
+                                showInfoCard={data => this.showInfoCard(data)}
+                            />
                         </div>
                     </Col>
                 </Row>
@@ -58,15 +93,6 @@ class Root extends Component {
         )
     }
 }
-
-
-// class SearchTable extends Component {
-//     render(){
-//         return(
-
-//         )
-//     }
-// }
 
 class TeacherTable extends Component {
     // 声明state
@@ -90,16 +116,17 @@ class TeacherTable extends Component {
             pagination: pager,
             currentPage: pagination.current // 更新当前页码
         })
-        this.queryPage(pagination.current, pagination.pageSize) // 传递正确的参数
+        this.queryPage(pagination.current, pagination.pageSize, filters) // 传递正确的参数
     }
 
     // 异步获取数据
-    queryPage = (pageIndex, pageSize) => {
+    queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
         let url = HOST + '/admin/teacher/queryPage'
         let param = {
-            pageIndex: pageIndex,
-            pageSize: pageSize
+            ...(pageIndex !== null ? { pageIndex: pageIndex } : {}),
+            ...(pageSize !== null ? { pageSize: pageSize } : {}),
+            ...(filters !== null ? filters : {})
         }
         axios
             .post(url, param)
@@ -118,7 +145,7 @@ class TeacherTable extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => { })
+            .catch(err => {})
     }
 
     // 渲染数据
@@ -211,8 +238,7 @@ class InfoCardModal extends Component {
                 id: id,
                 data: {}
             })
-        }
-        else if (id !== this.state.id) {
+        } else if (id !== this.state.id) {
             // 查看详情 调用InfoCard的queryById方法
             console.log('showModal id不一致，将重新查询id:' + id)
             this.setState({
@@ -264,7 +290,7 @@ class InfoCardModal extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => { })
+            .catch(err => {})
     }
 
     render() {
@@ -327,8 +353,20 @@ class InfoCard extends Component {
     handleSave = () => {
         // 发送异步请求保存编辑后的数据
         let url = HOST + '/admin/teacher/save'
+        console.log('save:' + JSON.stringify(this.state.data))
+        let param = {
+            id: this.state.data.id,
+            nickname: this.state.data.nickname || '',
+            username: this.state.data.username || '',
+            channelUsername: this.state.data.channelUsername || '',
+            priceP: this.state.data.priceP || 0,
+            pricePp: this.state.data.pricePp || 0,
+            priceComplete: this.state.data.priceComplete || '',
+            region: this.state.data.region || '',
+            tag: this.state.data.tag || ''
+        }
         axios
-            .post(url, this.state.data)
+            .post(url, param)
             .then(res => {
                 if (res.data.code === 200 && res.data.data) {
                     notification.success({ message: '保存成功' })
@@ -354,7 +392,6 @@ class InfoCard extends Component {
         if (!visible) {
             return <div>页面关闭</div>
         }
-
 
         // if (!data) {
         //     return <div>数据加载失败</div>
