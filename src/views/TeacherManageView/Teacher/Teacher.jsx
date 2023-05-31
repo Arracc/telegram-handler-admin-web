@@ -6,8 +6,6 @@ import '@/style/view-style/table.scss'
 import axios from '@/api'
 import { HOST } from '@/api/config.js'
 
-const { Column } = Table
-
 class Root extends Component {
     state = {
         id: 0,
@@ -41,7 +39,17 @@ class Root extends Component {
         const { pagination } = this.TeacherTable.state
         const { current, pageSize } = pagination
         console.log(search)
-        this.TeacherTable.queryPage(null, 10, search)
+        this.TeacherTable.queryPage(1, this.TeacherTable.state.pagination.size, search)
+    }
+
+    refreshTable = () => {
+        console.log('root触发刷新')
+        const { search } = this.state
+        this.TeacherTable.queryPage(
+            this.TeacherTable.state.pagination.current,
+            this.TeacherTable.state.pagination.size,
+            search
+        )
     }
 
     render() {
@@ -54,7 +62,7 @@ class Root extends Component {
                     <Col>
                         <div className='base-style'>
                             {/* <h3 id='myTable'>用户列表</h3> */}
-                            {/* <SearchTable /> */}
+                            {/* <SearchBar /> */}
                             <div className='base-style'>
                                 <Divider />
                                 <span style={{ display: 'inline-block' }}>
@@ -88,7 +96,7 @@ class Root extends Component {
                     </Col>
                 </Row>
 
-                <InfoCardModal ref={node => (this.InfoCardModal = node)} />
+                <InfoCardModal ref={node => (this.InfoCardModal = node)} refreshTable={() => this.refreshTable()} />
             </Layout>
         )
     }
@@ -99,8 +107,7 @@ class TeacherTable extends Component {
     state = {
         data: [],
         pagination: {},
-        loading: false,
-        currentPage: 1
+        loading: false
     }
 
     // 初始化异步数据
@@ -110,13 +117,14 @@ class TeacherTable extends Component {
 
     // 数据变化处理
     handleTableChange = (pagination, filters, sorter) => {
-        const pager = { ...this.state.pagination }
-        pager.current = pagination.current
-        this.setState({
-            pagination: pager,
-            currentPage: pagination.current // 更新当前页码
-        })
-        this.queryPage(pagination.current, pagination.pageSize, filters) // 传递正确的参数
+        this.setState(
+            {
+                pagination
+            },
+            () => {
+                this.queryPage(pagination.current, pagination.size, filters)
+            }
+        )
     }
 
     // 异步获取数据
@@ -135,6 +143,7 @@ class TeacherTable extends Component {
                     const pagination = { ...this.state.pagination }
                     pagination.total = res.data.data.total
                     pagination.current = res.data.data.current
+                    pagination.size = res.data.data.size
                     this.setState({
                         loading: false,
                         data: res.data.data.records,
@@ -198,6 +207,11 @@ class TeacherTable extends Component {
             key: 'region'
         },
         {
+            title: '年龄',
+            dataIndex: 'age',
+            key: 'age'
+        },
+        {
             title: '标签',
             dataIndex: 'tag',
             key: 'tag'
@@ -255,11 +269,48 @@ class InfoCardModal extends Component {
         }
     }
 
+    handleChange = (fieldName, value) => {
+        const { data } = this.state
+        data[fieldName] = value
+        this.setState({ data })
+    }
+
     handleOk = () => {
         console.log('handleOk')
-        this.setState({
-            visible: false
-        })
+        // 提交表单
+        // 发送异步请求保存编辑后的数据
+        let url = HOST + '/admin/teacher/save'
+        console.log('save:' + JSON.stringify(this.state.data))
+        let param = {
+            id: this.state.data.id,
+            nickname: this.state.data.nickname || '',
+            username: this.state.data.username || '',
+            channelUsername: this.state.data.channelUsername || '',
+            priceP: this.state.data.priceP || 0,
+            pricePp: this.state.data.pricePp || 0,
+            priceComplete: this.state.data.priceComplete || '',
+            region: this.state.data.region || '',
+            age: this.state.data.age || 0,
+            tag: this.state.data.tag || ''
+        }
+        axios
+            .post(url, param)
+            .then(res => {
+                if (res.data.code === 200 && res.data.data) {
+                    notification.success({ message: '保存成功' })
+                    // 关闭窗口
+                    this.setState({
+                        visible: false
+                    })
+                    // 重新查询当前页
+                    this.props.refreshTable()
+                } else {
+                    notification.success({ message: '保存失败' })
+                }
+            })
+            .catch(err => {
+                notification.success({ message: '保存失败' })
+            })
     }
 
     handleCancel = () => {
@@ -294,6 +345,10 @@ class InfoCardModal extends Component {
     }
 
     render() {
+        const layout = {
+            labelCol: { span: 6 },
+            wrapperCol: { span: 12 }
+        }
         return (
             <>
                 <Modal
@@ -303,141 +358,69 @@ class InfoCardModal extends Component {
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     destroyOnClose={true}
-                    okText='确认'
+                    okText='保存'
                     cancelText='取消'>
-                    <InfoCard
-                        id={this.state.id}
-                        data={this.state.data}
-                        loading={this.state.loading}
-                        visible={this.state.visible}
-                    />
+                    <Form {...layout} ref={this.formRef}>
+                        <Form.Item label='ID' name='id'>
+                            <Input value={this.state.data.id} disabled />
+                        </Form.Item>
+                        <Form.Item label='名字' name='nickname'>
+                            <Input
+                                value={this.state.data.nickname}
+                                onChange={e => this.handleChange('nickname', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='用户名' name='username'>
+                            <Input
+                                value={this.state.data.username}
+                                onChange={e => this.handleChange('username', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='频道地址' name='channelUsername'>
+                            <Input
+                                value={this.state.data.channelUsername}
+                                onChange={e => this.handleChange('channelUsername', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='p价格' name='priceP'>
+                            <Input
+                                value={this.state.data.priceP}
+                                onChange={e => this.handleChange('priceP', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='pp价格' name='pricePp'>
+                            <Input
+                                value={this.state.data.pricePp}
+                                onChange={e => this.handleChange('pricePp', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='地区' name='region'>
+                            <Input
+                                value={this.state.data.region}
+                                onChange={e => this.handleChange('region', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='年龄' name='age'>
+                            <Input
+                                value={this.state.data.age}
+                                onChange={e => this.handleChange('age', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='标签' name='tag'>
+                            <Input
+                                value={this.state.data.tag}
+                                onChange={e => this.handleChange('tag', e.target.value)}
+                            />
+                        </Form.Item>
+                        {/* 其他表单字段 */}
+                        {/* <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
+                            <Button type='primary' htmlType='submit'>
+                                保存
+                            </Button>
+                        </Form.Item> */}
+                    </Form>
                 </Modal>
             </>
-        )
-    }
-}
-
-class InfoCard extends Component {
-    formRef = React.createRef()
-
-    // 声明state
-    state = {
-        loading: false,
-        id: 0,
-        data: {}
-    }
-
-    // 初始化异步数据
-    componentDidMount() {
-        this.updateData(this.props.data)
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.data !== this.props.data) {
-            this.updateData(this.props.data)
-        }
-    }
-
-    updateData(data) {
-        this.setState({
-            data: data
-        })
-    }
-
-    handleChange = (fieldName, value) => {
-        const { data } = this.state
-        data[fieldName] = value
-        this.setState({ data })
-    }
-
-    handleSave = () => {
-        // 发送异步请求保存编辑后的数据
-        let url = HOST + '/admin/teacher/save'
-        console.log('save:' + JSON.stringify(this.state.data))
-        let param = {
-            id: this.state.data.id,
-            nickname: this.state.data.nickname || '',
-            username: this.state.data.username || '',
-            channelUsername: this.state.data.channelUsername || '',
-            priceP: this.state.data.priceP || 0,
-            pricePp: this.state.data.pricePp || 0,
-            priceComplete: this.state.data.priceComplete || '',
-            region: this.state.data.region || '',
-            tag: this.state.data.tag || ''
-        }
-        axios
-            .post(url, param)
-            .then(res => {
-                if (res.data.code === 200 && res.data.data) {
-                    notification.success({ message: '保存成功' })
-                } else {
-                    notification.success({ message: '保存失败' })
-                }
-            })
-            .catch(err => {
-                notification.success({ message: '保存失败' })
-            })
-    }
-
-    // 渲染数据
-    render() {
-        const data = this.props.data
-        const loading = this.props.loading
-        const visible = this.props.visible
-        const layout = {
-            labelCol: { span: 6 },
-            wrapperCol: { span: 12 }
-        }
-
-        if (!visible) {
-            return <div>页面关闭</div>
-        }
-
-        // if (!data) {
-        //     return <div>数据加载失败</div>
-        // }
-
-        if (loading) {
-            return <div>数据加载中</div>
-        }
-
-        console.log('visiable:' + this.props.visible + ' 触发渲染:' + JSON.stringify(data))
-        return (
-            <Form {...layout} ref={this.formRef} onSubmit={this.handleSave}>
-                <Form.Item label='ID' name='id'>
-                    <Input value={data.id} disabled />
-                </Form.Item>
-                <Form.Item label='名字' name='nickname'>
-                    <Input value={data.nickname} onChange={e => this.handleChange('nickname', e.target.value)} />
-                </Form.Item>
-                <Form.Item label='用户名' name='username'>
-                    <Input value={data.username} onChange={e => this.handleChange('username', e.target.value)} />
-                </Form.Item>
-                <Form.Item label='频道地址' name='channelUsername'>
-                    <Input
-                        value={data.channelUsername}
-                        onChange={e => this.handleChange('channelUsername', e.target.value)}
-                    />
-                </Form.Item>
-                <Form.Item label='p价格' name='priceP'>
-                    <Input value={data.priceP} onChange={e => this.handleChange('priceP', e.target.value)} />
-                </Form.Item>
-                <Form.Item label='pp价格' name='pricePp'>
-                    <Input value={data.pricePp} onChange={e => this.handleChange('pricePp', e.target.value)} />
-                </Form.Item>
-                <Form.Item label='地区' name='region'>
-                    <Input value={data.region} onChange={e => this.handleChange('region', e.target.value)} />
-                </Form.Item>
-                <Form.Item label='标签' name='tag'>
-                    <Input value={data.tag} onChange={e => this.handleChange('tag', e.target.value)} />
-                </Form.Item>
-                {/* 其他表单字段 */}
-                <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-                    <Button type='primary' htmlType='submit'>
-                        保存
-                    </Button>
-                </Form.Item>
-            </Form>
         )
     }
 }
