@@ -412,12 +412,6 @@ class InfoCardModal extends Component {
                                 onChange={e => this.handleChange('tag', e.target.value)}
                             />
                         </Form.Item>
-                        {/* 其他表单字段 */}
-                        {/* <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-                            <Button type='primary' htmlType='submit'>
-                                保存
-                            </Button>
-                        </Form.Item> */}
                     </Form>
                 </Modal>
             </>

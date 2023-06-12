@@ -2,6 +2,6 @@
 
 // host
 // 本地环境
-export const HOST = 'http://localhost:3000/api2'
-// 测试环境
-// export const HOST = 'http://im.truckego.net'
+// export const HOST = 'http://localhost:3000/api2'
+// 生产环境
+export const HOST = 'https://telegram.345555.xyz/admin'
