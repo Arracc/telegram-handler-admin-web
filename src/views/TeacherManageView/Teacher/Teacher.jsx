@@ -286,12 +286,20 @@ class InfoCardModal extends Component {
             nickname: this.state.data.nickname || '',
             username: this.state.data.username || '',
             channelUsername: this.state.data.channelUsername || '',
-            priceP: this.state.data.priceP || 0,
-            pricePp: this.state.data.pricePp || 0,
             priceComplete: this.state.data.priceComplete || '',
             region: this.state.data.region || '',
-            age: this.state.data.age || 0,
             tag: this.state.data.tag || ''
+        }
+        if (this.state.data.priceP) {
+            param.priceP = this.state.data.priceP
+        }
+
+        if (this.state.data.pricePp) {
+            param.pricePp = this.state.data.pricePp
+        }
+
+        if (this.state.data.age) {
+            param.age = this.state.data.age
         }
         axios
             .post(url, param)
