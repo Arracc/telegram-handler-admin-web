@@ -1,10 +1,27 @@
 import React, { Component } from 'react'
 import CustomBreadcrumb from '@/components/CustomBreadcrumb'
-import { Layout, Divider, Row, Col, Tag, Table, Button, Anchor, Modal, Form, Input, notification } from 'antd'
+import { Layout, Divider, Row, Col, Tag, Table, Button, Anchor, Modal, Form, Input, notification, Select } from 'antd'
 
 import '@/style/view-style/table.scss'
 import axios from '@/api'
 import { HOST } from '@/api/config.js'
+
+// 可选项数组
+const regionOptions = [
+    { label: '南山', value: '南山' },
+    { label: '福田', value: '福田' },
+    { label: '罗湖', value: '罗湖' },
+    { label: '宝安', value: '宝安' },
+    { label: '龙华', value: '龙华' },
+    { label: '龙岗', value: '龙岗' },
+    { label: '盐田', value: '盐田' },
+    { label: '大鹏', value: '大鹏' }
+]
+
+const ageOptions = []
+for (let age = 18; age <= 30; age++) {
+    ageOptions.push({ label: age.toString(), value: age.toString() })
+}
 
 class Root extends Component {
     state = {
@@ -13,8 +30,9 @@ class Root extends Component {
             nickname: null,
             username: null,
             region: null,
-            priceGt: null,
-            priceLt: null
+            priceGe: null,
+            priceLe: null,
+            age: null
         }
     }
 
@@ -60,27 +78,70 @@ class Root extends Component {
                 </div>
                 <Row>
                     <Col>
-                        <div className='base-style'>
+                        <div className='base-style' style={{ width: '100%' }}>
                             {/* <h3 id='myTable'>用户列表</h3> */}
                             {/* <SearchBar /> */}
-                            <div className='base-style'>
-                                <Divider />
-                                <span style={{ display: 'inline-block' }}>
+                            <div className='base-style' style={{ display: 'inline-block' }}>
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     名字：
-                                    <Input onChange={e => this.handleChange('nickname', e.target.value)} />
+                                    <Input
+                                        style={{ width: '200px' }}
+                                        onChange={e => this.handleChange('nickname', e.target.value)}
+                                    />
                                 </span>
-                                <span style={{ display: 'inline-block' }}>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     用户名：
-                                    <Input onChange={e => this.handleChange('username', e.target.value)} />
+                                    <Input
+                                        style={{ width: '200px' }}
+                                        onChange={e => this.handleChange('username', e.target.value)}
+                                    />
                                 </span>
-                                <span style={{ display: 'inline-block' }}>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    价格：
+                                    <Input
+                                        style={{ width: '70px' }}
+                                        onChange={e => this.handleChange('priceGe', e.target.value)}
+                                    />
+                                    &nbsp;-&nbsp;
+                                    <Input
+                                        style={{ width: '70px' }}
+                                        onChange={e => this.handleChange('priceLe', e.target.value)}
+                                    />
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    年龄：
+                                    <Select
+                                        style={{ width: '100px' }}
+                                        onChange={value => this.handleChange('age', value)}>
+                                        {ageOptions.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     地区：
-                                    <Input onChange={e => this.handleChange('region', e.target.value)} />
+                                    <Select
+                                        style={{ width: '100px' }}
+                                        onChange={value => this.handleChange('region', value)}>
+                                        {regionOptions.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
                                 </span>
+
                                 <span style={{ display: 'inline-block' }}>
                                     <Button onClick={this.handleSearch}>查找</Button>
                                 </span>
                             </div>
+
                             <div>
                                 <Button type='button' onClick={() => this.showInfoCard(0)}>
                                     新增
@@ -88,10 +149,14 @@ class Root extends Component {
                             </div>
 
                             <Divider />
-                            <TeacherTable
-                                ref={node => (this.TeacherTable = node)}
-                                showInfoCard={data => this.showInfoCard(data)}
-                            />
+
+                            <div>
+                                <TeacherTable
+                                    filters={this.state.search}
+                                    ref={node => (this.TeacherTable = node)}
+                                    showInfoCard={data => this.showInfoCard(data)}
+                                />
+                            </div>
                         </div>
                     </Col>
                 </Row>
@@ -122,6 +187,8 @@ class TeacherTable extends Component {
                 pagination
             },
             () => {
+                filters = this.props.filters
+                console.log('触发分页数据变化: ' + JSON.stringify(filters))
                 this.queryPage(pagination.current, pagination.size, filters)
             }
         )
@@ -130,7 +197,7 @@ class TeacherTable extends Component {
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/teacher/queryPage'
+        let url = HOST + '/admin/teacher/page'
         let param = {
             ...(pageIndex !== null ? { pageIndex: pageIndex } : {}),
             ...(pageSize !== null ? { pageSize: pageSize } : {}),
@@ -357,6 +424,7 @@ class InfoCardModal extends Component {
             labelCol: { span: 6 },
             wrapperCol: { span: 12 }
         }
+
         return (
             <>
                 <Modal
@@ -403,10 +471,15 @@ class InfoCardModal extends Component {
                             />
                         </Form.Item>
                         <Form.Item label='地区' name='region'>
-                            <Input
+                            <Select
                                 value={this.state.data.region}
-                                onChange={e => this.handleChange('region', e.target.value)}
-                            />
+                                onChange={value => this.handleChange('region', value)}>
+                                {regionOptions.map(option => (
+                                    <Select.Option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                         <Form.Item label='年龄' name='age'>
                             <Input
