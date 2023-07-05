@@ -4,6 +4,9 @@ const Index = loadable(() => import(/* webpackChunkName: 'index' */ '@/views/Ind
 
 // 用户管理
 const TeacherView = loadable(() => import(/* webpackChunkName: 'TeacherView' */ '@/views/TeacherManageView/Teacher'))
+const CandidateView = loadable(() =>
+    import(/* webpackChunkName: 'CandidateView' */ '@/views/CandidateManageView/Candidate')
+)
 // const GroupView = loadable(() => import(/* webpackChunkName: 'groupView' */ '@/views/TeacherManageView/Group'))
 
 // 消息记录
@@ -40,6 +43,7 @@ const About = loadable(() => import(/* webpackChunkName: 'about' */ '@/views/Abo
 const routes = [
     { path: '/index', exact: true, name: 'Index', component: Index, auth: [1] },
     { path: '/teacher-manage/teacher', exact: false, name: '用户列表', component: TeacherView, auth: [1] },
+    { path: '/candidate-manage/candidate', exact: false, name: '候选列表', component: CandidateView, auth: [1] },
     // { path: '/teacher-manage/group', exact: false, name: '群', component: GroupView, auth: [1] },
     // { path: '/message-record/undelivered-message', exact: false, name: '未送达消息', component: UndeliveredMessageView, auth: [1] },
 

@@ -7,10 +7,19 @@ const menu = [
     },
     {
         title: '用户管理',
-        key: '/session-manage',
+        key: '/user-manage',
         icon: 'pie-chart',
         subs: [
             { title: '用户列表', key: '/teacher-manage/teacher', icon: '' }
+            // { title: '群', key: '/session-manage/group', icon: '' },
+        ]
+    },
+    {
+        title: '候选管理',
+        key: '/candidate-manage',
+        icon: 'pie-chart',
+        subs: [
+            { title: '候选列表', key: '/candidate-manage/candidate', icon: '' }
             // { title: '群', key: '/session-manage/group', icon: '' },
         ]
     }

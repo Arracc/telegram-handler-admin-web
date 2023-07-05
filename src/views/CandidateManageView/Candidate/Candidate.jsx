@@ -6,6 +6,12 @@ import '@/style/view-style/table.scss'
 import axios from '@/api'
 import { HOST } from '@/api/config.js'
 
+const choiceOptions = [
+    { label: '', value: null },
+    { label: '是', value: 1 },
+    { label: '否', value: 0 }
+]
+
 // 可选项数组
 const regionOptions = [
     { label: '南山', value: '南山' },
@@ -29,11 +35,10 @@ class Root extends Component {
         search: {
             nickname: null,
             username: null,
-            region: null,
-            priceGe: null,
-            priceLe: null,
-            age: null,
-            tag: null
+            bio: null,
+            timeStart: null,
+            timeEnd: null,
+            isProcessed: null
         }
     }
 
@@ -100,45 +105,32 @@ class Root extends Component {
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    标签：
+                                    简介：
                                     <Input
                                         style={{ width: '150px' }}
-                                        onChange={e => this.handleChange('tag', e.target.value)}
+                                        onChange={e => this.handleChange('bio', e.target.value)}
                                     />
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    价格：
+                                    收录时间：
                                     <Input
                                         style={{ width: '70px' }}
-                                        onChange={e => this.handleChange('priceGe', e.target.value)}
+                                        onChange={e => this.handleChange('timeStart', e.target.value)}
                                     />
                                     &nbsp;-&nbsp;
                                     <Input
                                         style={{ width: '70px' }}
-                                        onChange={e => this.handleChange('priceLe', e.target.value)}
+                                        onChange={e => this.handleChange('timeEnd', e.target.value)}
                                     />
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    年龄：
+                                    是否已处理：
                                     <Select
                                         style={{ width: '100px' }}
-                                        onChange={value => this.handleChange('age', value)}>
-                                        {ageOptions.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    地区：
-                                    <Select
-                                        style={{ width: '100px' }}
-                                        onChange={value => this.handleChange('region', value)}>
-                                        {regionOptions.map(option => (
+                                        onChange={value => this.handleChange('isProcessed', value)}>
+                                        {choiceOptions.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>
@@ -206,7 +198,7 @@ class TeacherTable extends Component {
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/teacher/page'
+        let url = HOST + '/admin/candidate/page'
         let param = {
             ...(pageIndex !== null ? { pageIndex: pageIndex } : {}),
             ...(pageSize !== null ? { pageSize: pageSize } : {}),
@@ -263,34 +255,19 @@ class TeacherTable extends Component {
             key: 'username'
         },
         {
-            title: '频道地址',
-            dataIndex: 'channelUsername',
-            key: 'channelUsername'
+            title: '简介',
+            dataIndex: 'bio',
+            key: 'bio'
         },
         {
-            title: 'p价格',
-            dataIndex: 'priceP',
-            key: 'priceP'
+            title: '收录时间',
+            dataIndex: 'discoveryTime',
+            key: 'discoveryTime'
         },
         {
-            title: 'pp价格',
-            dataIndex: 'pricePp',
-            key: 'pricePp'
-        },
-        {
-            title: '地区',
-            dataIndex: 'region',
-            key: 'region'
-        },
-        {
-            title: '年龄',
-            dataIndex: 'age',
-            key: 'age'
-        },
-        {
-            title: '标签',
-            dataIndex: 'tag',
-            key: 'tag'
+            title: '是否已处理',
+            dataIndex: 'isProcessed',
+            key: 'isProcessed'
         },
         {
             title: '操作',
@@ -355,8 +332,8 @@ class InfoCardModal extends Component {
         console.log('handleOk')
         // 提交表单
         // 发送异步请求保存编辑后的数据
-        let url = HOST + '/admin/teacher/save'
-        console.log('save:' + JSON.stringify(this.state.data))
+        let url = HOST + '/admin/candidate/update'
+        console.log('update:' + JSON.stringify(this.state.data))
         let param = {
             id: this.state.data.id,
             nickname: this.state.data.nickname || '',
@@ -406,7 +383,7 @@ class InfoCardModal extends Component {
 
     queryById = id => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/teacher/queryById'
+        let url = HOST + '/admin/candidate/info'
         let param = {
             id: id
         }
@@ -509,8 +486,8 @@ class InfoCardModal extends Component {
     }
 }
 
-const TeacherView = () => {
+const CandidateView = () => {
     return <Root />
 }
 
-export default TeacherView
+export default CandidateView
