@@ -200,8 +200,8 @@ class TeacherTable extends Component {
         this.setState({ loading: true })
         let url = HOST + '/admin/candidate/page'
         let param = {
-            ...(pageIndex !== null ? { pageIndex: pageIndex } : {}),
-            ...(pageSize !== null ? { pageSize: pageSize } : {}),
+            ...(pageIndex !== null ? { current: pageIndex } : {}),
+            ...(pageSize !== null ? { size: pageSize } : {}),
             ...(filters !== null ? filters : {})
         }
         axios
