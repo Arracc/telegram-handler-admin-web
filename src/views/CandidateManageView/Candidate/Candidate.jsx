@@ -200,8 +200,8 @@ class TeacherTable extends Component {
         this.setState({ loading: true })
         let url = HOST + '/admin/candidate/page'
         let param = {
-            ...(pageIndex !== null ? { pageIndex: pageIndex } : {}),
-            ...(pageSize !== null ? { pageSize: pageSize } : {}),
+            ...(pageIndex !== null ? { current: pageIndex } : {}),
+            ...(pageSize !== null ? { size: pageSize } : {}),
             ...(filters !== null ? filters : {})
         }
         axios
@@ -227,11 +227,18 @@ class TeacherTable extends Component {
 
     // 渲染数据
     render() {
+        const { data, pagination } = this.state
+
+        const processedData = data.map((item, index) => ({
+            ...item,
+            index: (pagination.current - 1) * pagination.size + index + 1
+        }))
+
         return (
             <Table
                 rowKey={(r, i) => i.toString()}
                 columns={this.columns}
-                dataSource={this.state.data}
+                dataSource={processedData}
                 onChange={this.handleTableChange}
                 pagination={this.state.pagination}
             />
@@ -240,9 +247,9 @@ class TeacherTable extends Component {
 
     columns = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id'
+            title: '序号',
+            dataIndex: 'index',
+            key: 'index'
         },
         {
             title: '名字',

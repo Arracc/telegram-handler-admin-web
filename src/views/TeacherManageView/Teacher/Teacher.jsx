@@ -1,10 +1,29 @@
 import React, { Component } from 'react'
+import {
+    Layout,
+    Divider,
+    Row,
+    Col,
+    Tag,
+    Table,
+    Button,
+    Anchor,
+    Modal,
+    Form,
+    Input,
+    notification,
+    Select,
+    List,
+    AutoComplete
+} from 'antd'
 import CustomBreadcrumb from '@/components/CustomBreadcrumb'
-import { Layout, Divider, Row, Col, Tag, Table, Button, Anchor, Modal, Form, Input, notification, Select } from 'antd'
-
 import '@/style/view-style/table.scss'
 import axios from '@/api'
 import { HOST } from '@/api/config.js'
+
+const { Option } = Select
+
+// 组件的其余代码...
 
 // 可选项数组
 const regionOptions = [
@@ -202,6 +221,19 @@ class TeacherTable extends Component {
         )
     }
 
+    handlePageSizeChange = value => {
+        const { pagination } = this.state
+        pagination.pageSize = value
+        this.setState(
+            {
+                pagination
+            },
+            () => {
+                this.queryPage(1, value)
+            }
+        )
+    }
+
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
@@ -238,17 +270,42 @@ class TeacherTable extends Component {
 
         const processedData = data.map((item, index) => ({
             ...item,
-            index: (pagination.current - 1) * pagination.size + index + 1
+            index: (pagination.current - 1) * pagination.pageSize + index + 1
         }))
 
+        const renderPagination = (page, type, originalElement) => {
+            if (type === 'prev') {
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Select
+                            defaultValue={pagination.pageSize}
+                            onChange={this.handlePageSizeChange}
+                            style={{ width: '80px', marginRight: '8px' }}>
+                            <Option value='10'>10条</Option>
+                            <Option value='20'>20条</Option>
+                            <Option value='50'>50条</Option>
+                            <Option value='100'>100条</Option>
+                        </Select>
+                        <div style={{ width: '30px' }}>{originalElement}</div>
+                    </div>
+                )
+            }
+            return originalElement
+        }
+
         return (
-            <Table
-                rowKey={(r, i) => i.toString()}
-                columns={this.columns}
-                dataSource={processedData}
-                onChange={this.handleTableChange}
-                pagination={this.state.pagination}
-            />
+            <div style={{ position: 'relative' }}>
+                <Table
+                    rowKey={(r, i) => i.toString()}
+                    columns={this.columns}
+                    dataSource={processedData}
+                    onChange={this.handleTableChange}
+                    pagination={{
+                        ...pagination,
+                        itemRender: renderPagination
+                    }}
+                />
+            </div>
         )
     }
 
@@ -331,7 +388,14 @@ class InfoCardModal extends Component {
             { label: '大车', value: '#大车' },
             { label: 'JK', value: '#JK' },
             { label: 'Lolita', value: '#Lolita' }
-        ]
+        ],
+        candidateList: [],
+        showCandidateList: false
+    }
+
+    constructor(props) {
+        super(props)
+        this.formRef = React.createRef()
     }
 
     showModal = id => {
@@ -359,10 +423,52 @@ class InfoCardModal extends Component {
         }
     }
 
-    handleChange = (fieldName, value) => {
-        const { data } = this.state
-        data[fieldName] = value
-        this.setState({ data })
+    handleChange = async (field, value) => {
+        this.setState(prevState => ({
+            data: {
+                ...prevState.data,
+                [field]: value
+            }
+        }))
+
+        if (field === 'nickname') {
+            if (value.trim() === '') {
+                this.setState({
+                    showCandidateList: false,
+                    candidateList: []
+                })
+            } else {
+                try {
+                    const response = await axios.get(HOST + '/admin/candidate/queryByName', {
+                        params: {
+                            name: value
+                        }
+                    })
+
+                    const candidateList = response.data.data // 假设服务器返回一个候选人名称的数组
+
+                    this.setState({
+                        candidateList,
+                        showCandidateList: candidateList.length > 0 // 如果 candidateList 不为空，则设置 showCandidateList 为 true，否则为 false
+                    })
+                } catch (error) {
+                    // 处理请求错误
+                }
+            }
+        }
+    }
+
+    handleNicknameSelection = candidate => {
+        this.setState(prevState => ({
+            data: {
+                ...prevState.data,
+                nickname: candidate.nickname,
+                username: candidate.username,
+                channelUsername: candidate.bio,
+                userId: candidate.userId,
+                region: candidate.region
+            }
+        }))
     }
 
     handleOk = () => {
@@ -477,10 +583,26 @@ class InfoCardModal extends Component {
                             <Input value={this.state.data.id} disabled />
                         </Form.Item>
                         <Form.Item label='名字' name='nickname'>
-                            <Input
+                            <AutoComplete
                                 value={this.state.data.nickname}
-                                onChange={e => this.handleChange('nickname', e.target.value)}
-                            />
+                                onChange={value => this.handleChange('nickname', value)}
+                                // dataSource={this.state.candidateList
+                                //     .map(candidate => ({
+                                //         value: candidate.id + ':' + candidate.nickname,
+                                //         key: candidate.id // 使用候选人的唯一标识作为 key
+                                //     }))
+                                // }
+                            >
+                                {this.state.candidateList.map(candidate => (
+                                    <AutoComplete.Option
+                                        key={candidate.id}
+                                        value={candidate.id + ':' + candidate.nickname}
+                                        label={candidate.nickname}
+                                        onClick={() => this.handleNicknameSelection(candidate)}>
+                                        {candidate.nickname}
+                                    </AutoComplete.Option>
+                                ))}
+                            </AutoComplete>
                         </Form.Item>
                         <Form.Item label='用户名' name='username'>
                             <Input
