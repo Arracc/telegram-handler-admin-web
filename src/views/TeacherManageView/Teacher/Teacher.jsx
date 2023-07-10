@@ -80,7 +80,6 @@ class Root extends Component {
                 <Row>
                     <Col>
                         <div className='base-style' style={{ width: '100%' }}>
-                            {/* <h3 id='myTable'>用户列表</h3> */}
                             {/* <SearchBar /> */}
                             <div className='base-style' style={{ display: 'inline-block' }}>
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
@@ -208,8 +207,8 @@ class TeacherTable extends Component {
         this.setState({ loading: true })
         let url = HOST + '/admin/teacher/page'
         let param = {
-            ...(pageIndex !== null ? { pageIndex: pageIndex } : {}),
-            ...(pageSize !== null ? { pageSize: pageSize } : {}),
+            ...(pageIndex !== null ? { current: pageIndex } : {}),
+            ...(pageSize !== null ? { size: pageSize } : {}),
             ...(filters !== null ? filters : {})
         }
         axios
@@ -235,11 +234,18 @@ class TeacherTable extends Component {
 
     // 渲染数据
     render() {
+        const { data, pagination } = this.state
+
+        const processedData = data.map((item, index) => ({
+            ...item,
+            index: (pagination.current - 1) * pagination.size + index + 1
+        }))
+
         return (
             <Table
                 rowKey={(r, i) => i.toString()}
                 columns={this.columns}
-                dataSource={this.state.data}
+                dataSource={processedData}
                 onChange={this.handleTableChange}
                 pagination={this.state.pagination}
             />
@@ -248,9 +254,9 @@ class TeacherTable extends Component {
 
     columns = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id'
+            title: '序号',
+            dataIndex: 'index',
+            key: 'index'
         },
         {
             title: '名字',
@@ -317,7 +323,15 @@ class InfoCardModal extends Component {
         loading: false,
         visible: false,
         id: 0,
-        data: {}
+        data: {},
+        tagOptions: [
+            { label: 'kiss', value: '#kiss' },
+            { label: '舌吻', value: '#舌吻' },
+            { label: '69', value: '#69' },
+            { label: '大车', value: '#大车' },
+            { label: 'JK', value: '#JK' },
+            { label: 'Lolita', value: '#Lolita' }
+        ]
     }
 
     showModal = id => {
@@ -404,6 +418,17 @@ class InfoCardModal extends Component {
         })
     }
 
+    handleTagClick = tagValue => {
+        const { data } = this.state
+        const { tag } = data
+        if (tag) {
+            data.tag = `${tag} ${tagValue}`
+        } else {
+            data.tag = tagValue
+        }
+        this.setState({ data })
+    }
+
     queryById = id => {
         this.setState({ loading: true })
         let url = HOST + '/admin/teacher/queryById'
@@ -433,6 +458,8 @@ class InfoCardModal extends Component {
             labelCol: { span: 6 },
             wrapperCol: { span: 12 }
         }
+
+        const { data, tagOptions } = this.state
 
         return (
             <>
@@ -497,10 +524,23 @@ class InfoCardModal extends Component {
                             />
                         </Form.Item>
                         <Form.Item label='标签' name='tag'>
-                            <Input
-                                value={this.state.data.tag}
-                                onChange={e => this.handleChange('tag', e.target.value)}
-                            />
+                            <div>
+                                <Input
+                                    value={data.tag}
+                                    onChange={e => this.handleChange('tag', e.target.value)}
+                                    placeholder='输入标签'
+                                />
+                                <div style={{ marginTop: '8px' }}>
+                                    {tagOptions.map(option => (
+                                        <Tag
+                                            key={option.value}
+                                            onClick={() => this.handleTagClick(option.value)}
+                                            style={{ cursor: 'pointer' }}>
+                                            {option.label}
+                                        </Tag>
+                                    ))}
+                                </div>
+                            </div>
                         </Form.Item>
                     </Form>
                 </Modal>
