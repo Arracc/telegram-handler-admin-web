@@ -20,6 +20,7 @@ const regionOptions = [
     { label: '宝安', value: '宝安' },
     { label: '龙华', value: '龙华' },
     { label: '龙岗', value: '龙岗' },
+    { label: '光明', value: '光明' },
     { label: '盐田', value: '盐田' },
     { label: '大鹏', value: '大鹏' }
 ]
