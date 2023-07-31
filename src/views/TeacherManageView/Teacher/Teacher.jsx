@@ -684,16 +684,16 @@ class InfoCardModal extends Component {
         if (this.state.data.height) {
             param.height = this.state.data.height
         }
-        if (this.state.data.kissType) {
+        if (this.state.data.kissType != undefined) {
             param.kissType = this.state.data.kissType
         }
-        if (this.state.data.isSn) {
+        if (this.state.data.isSn != undefined) {
             param.isSn = this.state.data.isSn
         }
-        if (this.state.data.isJk) {
+        if (this.state.data.isJk != undefined) {
             param.isJk = this.state.data.isJk
         }
-        if (this.state.data.isLolita) {
+        if (this.state.data.isLolita != undefined) {
             param.isLolita = this.state.data.isLolita
         }
 
