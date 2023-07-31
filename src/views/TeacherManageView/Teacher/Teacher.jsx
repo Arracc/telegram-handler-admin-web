@@ -34,20 +34,26 @@ const regionOptions = [
     { label: '龙华', value: '龙华' },
     { label: '龙岗', value: '龙岗' },
     { label: '光明', value: '光明' },
-    { label: '光明', value: '光明' },
     { label: '盐田', value: '盐田' },
     { label: '大鹏', value: '大鹏' }
 ]
 
 const kissTypeOption = [
-    { label: '无', value: '0' },
-    { label: 'kiss', value: '1' },
-    { label: '舌吻', value: '2' }
+    { label: '\u00A0', value: null },
+    { label: '无', value: 0 },
+    { label: 'kiss', value: 1 },
+    { label: '舌吻', value: 2 }
 ]
 
 const commonOption = [
-    { label: '无', value: '0' },
-    { label: '有', value: '1' }
+    { label: '\u00A0', value: null },
+    { label: '无', value: 0 },
+    { label: '有', value: 1 }
+]
+const commonShowOption = [
+    { label: '\u00A0', value: null },
+    { label: '×', value: 0 },
+    { label: '√', value: 1 }
 ]
 
 const ageOptions = []
@@ -140,42 +146,28 @@ class Root extends Component {
                                         onChange={e => this.handleChange('tag', e.target.value)}
                                     />
                                 </span>
-
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     价格：
                                     <Input
-                                        style={{ width: '70px' }}
+                                        style={{ width: '50px' }}
                                         onChange={e => this.handleChange('priceGe', e.target.value)}
                                     />
                                     &nbsp;-&nbsp;
                                     <Input
-                                        style={{ width: '70px' }}
+                                        style={{ width: '50px' }}
                                         onChange={e => this.handleChange('priceLe', e.target.value)}
                                     />
                                 </span>
 
-                                {/* <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    年龄：
-                                    <Select
-                                        style={{ width: '100px' }}
-                                        onChange={value => this.handleChange('age', value)}>
-                                        {ageOptions.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span> */}
-
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     年龄：
                                     <Input
-                                        style={{ width: '70px' }}
+                                        style={{ width: '50px' }}
                                         onChange={e => this.handleChange('ageGe', e.target.value)}
                                     />
                                     &nbsp;-&nbsp;
                                     <Input
-                                        style={{ width: '70px' }}
+                                        style={{ width: '50px' }}
                                         onChange={e => this.handleChange('ageLe', e.target.value)}
                                     />
                                 </span>
@@ -183,12 +175,12 @@ class Root extends Component {
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     身高：
                                     <Input
-                                        style={{ width: '70px' }}
+                                        style={{ width: '50px' }}
                                         onChange={e => this.handleChange('heightGe', e.target.value)}
                                     />
                                     &nbsp;-&nbsp;
                                     <Input
-                                        style={{ width: '70px' }}
+                                        style={{ width: '50px' }}
                                         onChange={e => this.handleChange('heightLe', e.target.value)}
                                     />
                                 </span>
@@ -196,9 +188,61 @@ class Root extends Component {
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     地区：
                                     <Select
-                                        style={{ width: '100px' }}
+                                        style={{ width: '80px' }}
                                         onChange={value => this.handleChange('region', value)}>
                                         {regionOptions.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    kiss：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('kissType', value)}>
+                                        {kissTypeOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    69：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isSn', value)}>
+                                        {commonOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    JK：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isJk', value)}>
+                                        {commonOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    Lolita：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isLolita', value)}>
+                                        {commonOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>
@@ -242,6 +286,18 @@ class TeacherTable extends Component {
         data: [],
         pagination: {},
         loading: false
+    }
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            data: [], // 你的数据数组
+            pagination: {
+                current: 1, // 将默认当前页设置为1
+                pageSize: 10 // 将默认页面大小设置为10
+                // 其他分页属性（例如total，showSizeChanger等）
+            }
+        }
     }
 
     // 初始化异步数据
@@ -306,10 +362,6 @@ class TeacherTable extends Component {
             .catch(err => {})
     }
 
-    getKissTypeDesc = val => {
-        return kissTypeOption.get
-    }
-
     // 渲染数据
     render() {
         const { data, pagination } = this.state
@@ -323,14 +375,16 @@ class TeacherTable extends Component {
             if (type === 'prev') {
                 return (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
+                        共<span>{this.state.pagination.total}</span>
+                        条， 每页显示记录数：
                         <Select
                             defaultValue={pagination.pageSize}
                             onChange={this.handlePageSizeChange}
                             style={{ width: '80px', marginRight: '8px' }}>
-                            <Option value='10'>10条</Option>
-                            <Option value='20'>20条</Option>
-                            <Option value='50'>50条</Option>
-                            <Option value='100'>100条</Option>
+                            <Option value='10'>10</Option>
+                            <Option value='20'>20</Option>
+                            <Option value='50'>50</Option>
+                            <Option value='100'>100</Option>
                         </Select>
                         <div style={{ width: '30px' }}>{originalElement}</div>
                     </div>
@@ -359,75 +413,123 @@ class TeacherTable extends Component {
         {
             title: '序号',
             dataIndex: 'index',
-            key: 'index'
+            key: 'index',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '名字',
             dataIndex: 'nickname',
-            key: 'nickname'
+            key: 'nickname',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '用户名',
             dataIndex: 'username',
-            key: 'username'
+            key: 'username',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '频道地址',
             dataIndex: 'channelUsername',
-            key: 'channelUsername'
+            key: 'channelUsername',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: 'p价格',
             dataIndex: 'priceP',
-            key: 'priceP'
+            key: 'priceP',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: 'pp价格',
             dataIndex: 'pricePp',
-            key: 'pricePp'
+            key: 'pricePp',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '地区',
             dataIndex: 'region',
-            key: 'region'
+            key: 'region',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '年龄',
             dataIndex: 'age',
-            key: 'age'
+            key: 'age',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '身高',
             dataIndex: 'height',
-            key: 'height'
+            key: 'height',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
-            title: '是否kiss',
+            title: 'kiss',
             dataIndex: 'kissType',
             key: 'kissType',
             render: val => {
-                return get
-            }
+                const selectedOption = kissTypeOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
-            title: '是否69',
+            title: '69',
             dataIndex: 'isSn',
-            key: 'isSn'
+            key: 'isSn',
+            render: val => {
+                const selectedOption = commonShowOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
-            title: '是否JK',
+            title: 'JK',
             dataIndex: 'isJk',
-            key: 'isJk'
+            key: 'isJk',
+            render: val => {
+                const selectedOption = commonShowOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
-            title: '是否Lolita',
+            title: 'Lolita',
             dataIndex: 'isLolita',
-            key: 'isLolita'
+            key: 'isLolita',
+            render: val => {
+                const selectedOption = commonShowOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '标签',
             dataIndex: 'tag',
-            key: 'tag'
+            key: 'tag',
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '备注',
+            dataIndex: 'remark',
+            key: 'remark',
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '操作',
@@ -439,7 +541,9 @@ class TeacherTable extends Component {
                         </Button>
                     </span>
                 )
-            }
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
         }
     ]
 
@@ -472,7 +576,6 @@ class InfoCardModal extends Component {
         super(props)
         this.formRef = React.createRef()
     }
-
     showModal = id => {
         if (id == 0) {
             // 新增
@@ -499,6 +602,7 @@ class InfoCardModal extends Component {
     }
 
     handleChange = async (field, value) => {
+        console.log(field + value)
         this.setState(prevState => ({
             data: {
                 ...prevState.data,
@@ -581,16 +685,16 @@ class InfoCardModal extends Component {
             param.height = this.state.data.height
         }
         if (this.state.data.kissType) {
-            param.height = this.state.data.kissType
+            param.kissType = this.state.data.kissType
         }
         if (this.state.data.isSn) {
-            param.height = this.state.data.isSn
+            param.isSn = this.state.data.isSn
         }
         if (this.state.data.isJk) {
-            param.height = this.state.data.isJk
+            param.isJk = this.state.data.isJk
         }
         if (this.state.data.isLolita) {
-            param.height = this.state.data.isLolita
+            param.isLolita = this.state.data.isLolita
         }
 
         axios
@@ -805,12 +909,6 @@ class InfoCardModal extends Component {
                                     ))}
                                 </div>
                             </div>
-                        </Form.Item>
-                        <Form.Item label='备注' name='remark'>
-                            <Input
-                                value={this.state.data.remark}
-                                onChange={e => this.handleChange('remark', e.target.value)}
-                            />
                         </Form.Item>
                         <Form.Item label='备注' name='remark'>
                             <Input

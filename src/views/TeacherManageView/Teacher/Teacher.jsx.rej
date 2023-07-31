@@ -1,0 +1,15 @@
+diff a/src/views/TeacherManageView/Teacher/Teacher.jsx b/src/views/TeacherManageView/Teacher/Teacher.jsx	(rejected hunks)
+@@ -45 +45 @@ const kissTypeOption = [
+-    { label: '舌吻', value: '2' },
++    { label: '舌吻', value: '2' }
+@@ -50 +50 @@ const commonOption = [
+-    { label: '有', value: '1' },
++    { label: '有', value: '1' }
+@@ -312 +309 @@ class TeacherTable extends Component {
+-    getKissTypeDesc = (val) => {
++    getKissTypeDesc = val => {
+@@ -411 +408,3 @@ class TeacherTable extends Component {
+-            render:(val) => {return get}
++            render: val => {
++                return get
++            }
