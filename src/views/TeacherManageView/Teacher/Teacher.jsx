@@ -50,10 +50,27 @@ const commonOption = [
     { label: '无', value: 0 },
     { label: '有', value: 1 }
 ]
+
 const commonShowOption = [
     { label: '\u00A0', value: null },
     { label: '×', value: 0 },
     { label: '√', value: 1 }
+]
+
+const statusOption = [
+    { label: '\u00A0', value: null },
+    { label: '正常', value: 1 },
+    { label: '暂离', value: 2 },
+    { label: '失联', value: 3 },
+    { label: '失效', value: 4 }
+]
+
+const lastSeenOption = [
+    { label: '\u00A0', value: null },
+    { label: '最近', value: 1 },
+    { label: '一周前', value: 2 },
+    { label: '一个月前', value: 3 },
+    { label: '很久之前', value: 4 }
 ]
 
 const ageOptions = []
@@ -250,6 +267,19 @@ class Root extends Component {
                                     </Select>
                                 </span>
 
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    状态
+                                    <Select
+                                        style={{ width: '80px' }}
+                                        onChange={value => this.handleChange('status', value)}>
+                                        {statusOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
                                 <span style={{ display: 'inline-block' }}>
                                     <Button onClick={this.handleSearch}>查找</Button>
                                 </span>
@@ -359,7 +389,7 @@ class TeacherTable extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => {})
+            .catch(err => { })
     }
 
     // 渲染数据
@@ -532,6 +562,28 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            render: val => {
+                const selectedOption = statusOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '最近上线',
+            dataIndex: 'lastSeen',
+            key: 'lastSeen',
+            render: val => {
+                const selectedOption = lastSeenOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '操作',
             render: (text, record, index) => {
                 return (
@@ -684,17 +736,25 @@ class InfoCardModal extends Component {
         if (this.state.data.height) {
             param.height = this.state.data.height
         }
+
         if (this.state.data.kissType != undefined) {
             param.kissType = this.state.data.kissType
         }
+
         if (this.state.data.isSn != undefined) {
             param.isSn = this.state.data.isSn
         }
+
         if (this.state.data.isJk != undefined) {
             param.isJk = this.state.data.isJk
         }
+
         if (this.state.data.isLolita != undefined) {
             param.isLolita = this.state.data.isLolita
+        }
+
+        if (this.state.data.status != undefined) {
+            param.status = this.state.data.status
         }
 
         axios
@@ -756,7 +816,7 @@ class InfoCardModal extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => {})
+            .catch(err => { })
     }
 
     render() {
@@ -786,12 +846,12 @@ class InfoCardModal extends Component {
                             <AutoComplete
                                 value={this.state.data.nickname}
                                 onChange={value => this.handleChange('nickname', value)}
-                                // dataSource={this.state.candidateList
-                                //     .map(candidate => ({
-                                //         value: candidate.id + ':' + candidate.nickname,
-                                //         key: candidate.id // 使用候选人的唯一标识作为 key
-                                //     }))
-                                // }
+                            // dataSource={this.state.candidateList
+                            //     .map(candidate => ({
+                            //         value: candidate.id + ':' + candidate.nickname,
+                            //         key: candidate.id // 使用候选人的唯一标识作为 key
+                            //     }))
+                            // }
                             >
                                 {this.state.candidateList.map(candidate => (
                                     <AutoComplete.Option
@@ -916,6 +976,18 @@ class InfoCardModal extends Component {
                                 onChange={e => this.handleChange('remark', e.target.value)}
                             />
                         </Form.Item>
+
+                        <Form.Item label='状态' name='status'>
+                        <Select
+                            value={this.state.data.status}
+                            onChange={value => this.handleChange('status', value)}>
+                            {statusOption.map(option => (
+                                <Select.Option key={option.value} value={option.value}>
+                                    {option.label}
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
                     </Form>
                 </Modal>
             </>
