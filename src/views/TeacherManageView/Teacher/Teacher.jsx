@@ -62,7 +62,8 @@ const statusOption = [
     { label: '正常', value: 1 },
     { label: '暂离', value: 2 },
     { label: '失联', value: 3 },
-    { label: '失效', value: 4 }
+    { label: '上岸', value: 4 },
+    { label: '失效', value: 5 }
 ]
 
 const lastSeenOption = [
@@ -91,7 +92,7 @@ class Root extends Component {
             ageLe: null,
             heightGe: null,
             heightLe: null,
-            tag: null
+            tag: null,
         }
     }
 
@@ -218,8 +219,13 @@ class Root extends Component {
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     kiss：
                                     <Select
-                                        style={{ width: '50px' }}
-                                        onChange={value => this.handleChange('kissType', value)}>
+                                        style={{ width: '150px' }}
+                                        mode="multiple" // 设置为多选模式
+                                        onChange={values => this.handleChange('kissType', values)} // 注意这里的values是一个数组
+                                    >
+                                        <Select.Option key="empty" value="">
+                                            {/* 空白选项 */}
+                                        </Select.Option>
                                         {kissTypeOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
@@ -270,8 +276,13 @@ class Root extends Component {
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     状态
                                     <Select
-                                        style={{ width: '80px' }}
-                                        onChange={value => this.handleChange('status', value)}>
+                                        style={{ width: '160px' }}
+                                        mode="multiple" // 设置为多选模式
+                                        onChange={values => this.handleChange('status', values)} // 注意这里的values是一个数组
+                                    >
+                                        <Select.Option key="empty" value="">
+                                            {/* 空白选项 */}
+                                        </Select.Option>
                                         {statusOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
@@ -357,7 +368,7 @@ class TeacherTable extends Component {
                 pagination
             },
             () => {
-                this.queryPage(1, value)
+                this.queryPage(1, value, this.props.filters)
             }
         )
     }
@@ -365,7 +376,7 @@ class TeacherTable extends Component {
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/teacher/page'
+        let url = HOST + '/teacher/page'
         let param = {
             ...(pageIndex !== null ? { current: pageIndex } : {}),
             ...(pageSize !== null ? { size: pageSize } : {}),
@@ -670,7 +681,7 @@ class InfoCardModal extends Component {
                 })
             } else {
                 try {
-                    const response = await axios.get(HOST + '/admin/candidate/queryByName', {
+                    const response = await axios.get(HOST + '/candidate/queryByName', {
                         params: {
                             name: value
                         }
@@ -706,7 +717,7 @@ class InfoCardModal extends Component {
         console.log('handleOk')
         // 提交表单
         // 发送异步请求保存编辑后的数据
-        let url = HOST + '/admin/teacher/save'
+        let url = HOST + '/teacher/save'
         console.log('save:' + JSON.stringify(this.state.data))
         let param = {
             id: this.state.data.id,
@@ -797,7 +808,7 @@ class InfoCardModal extends Component {
 
     queryById = id => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/teacher/queryById'
+        let url = HOST + '/teacher/queryById'
         let param = {
             id: id
         }
@@ -978,16 +989,16 @@ class InfoCardModal extends Component {
                         </Form.Item>
 
                         <Form.Item label='状态' name='status'>
-                        <Select
-                            value={this.state.data.status}
-                            onChange={value => this.handleChange('status', value)}>
-                            {statusOption.map(option => (
-                                <Select.Option key={option.value} value={option.value}>
-                                    {option.label}
-                                </Select.Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
+                            <Select
+                                value={this.state.data.status}
+                                onChange={value => this.handleChange('status', value)}>
+                                {statusOption.map(option => (
+                                    <Select.Option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
                     </Form>
                 </Modal>
             </>

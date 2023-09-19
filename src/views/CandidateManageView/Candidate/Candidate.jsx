@@ -199,7 +199,7 @@ class TeacherTable extends Component {
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/candidate/page'
+        let url = HOST + '/candidate/page'
         let param = {
             ...(pageIndex !== null ? { current: pageIndex } : {}),
             ...(pageSize !== null ? { size: pageSize } : {}),
@@ -340,7 +340,7 @@ class InfoCardModal extends Component {
         console.log('handleOk')
         // 提交表单
         // 发送异步请求保存编辑后的数据
-        let url = HOST + '/admin/candidate/update'
+        let url = HOST + '/candidate/update'
         console.log('update:' + JSON.stringify(this.state.data))
         let param = {
             id: this.state.data.id,
@@ -391,7 +391,7 @@ class InfoCardModal extends Component {
 
     queryById = id => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/candidate/info'
+        let url = HOST + '/candidate/info'
         let param = {
             id: id
         }
