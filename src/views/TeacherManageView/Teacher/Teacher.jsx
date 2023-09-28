@@ -51,10 +51,28 @@ const commonOption = [
     { label: '无', value: 0 },
     { label: '有', value: 1 }
 ]
+
 const commonShowOption = [
     { label: '\u00A0', value: null },
     { label: '×', value: 0 },
     { label: '√', value: 1 }
+]
+
+const statusOption = [
+    { label: '\u00A0', value: null },
+    { label: '正常', value: 1 },
+    { label: '暂离', value: 2 },
+    { label: '失联', value: 3 },
+    { label: '上岸', value: 4 },
+    { label: '失效', value: 5 }
+]
+
+const lastSeenOption = [
+    { label: '\u00A0', value: null },
+    { label: '最近', value: 1 },
+    { label: '一周前', value: 2 },
+    { label: '一个月前', value: 3 },
+    { label: '很久之前', value: 4 }
 ]
 
 const ageOptions = []
@@ -202,8 +220,13 @@ class Root extends Component {
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     kiss：
                                     <Select
-                                        style={{ width: '50px' }}
-                                        onChange={value => this.handleChange('kissType', value)}>
+                                        style={{ width: '150px' }}
+                                        mode='multiple' // 设置为多选模式
+                                        onChange={values => this.handleChange('kissType', values)} // 注意这里的values是一个数组
+                                    >
+                                        <Select.Option key='empty' value=''>
+                                            {/* 空白选项 */}
+                                        </Select.Option>
                                         {kissTypeOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
@@ -244,6 +267,24 @@ class Root extends Component {
                                         style={{ width: '50px' }}
                                         onChange={value => this.handleChange('isLolita', value)}>
                                         {commonOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    状态
+                                    <Select
+                                        style={{ width: '160px' }}
+                                        mode='multiple' // 设置为多选模式
+                                        onChange={values => this.handleChange('status', values)} // 注意这里的values是一个数组
+                                    >
+                                        <Select.Option key='empty' value=''>
+                                            {/* 空白选项 */}
+                                        </Select.Option>
+                                        {statusOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>
@@ -540,6 +581,28 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            render: val => {
+                const selectedOption = statusOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '最近上线',
+            dataIndex: 'lastSeen',
+            key: 'lastSeen',
+            render: val => {
+                const selectedOption = lastSeenOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '操作',
             render: (text, record, index) => {
                 return (
@@ -692,25 +755,21 @@ class InfoCardModal extends Component {
         if (this.state.data.height) {
             param.height = this.state.data.height
         }
-
-        if (this.state.data.weight) {
-            param.height = this.state.data.weight
-        }
-
         if (this.state.data.kissType) {
             param.kissType = this.state.data.kissType
         }
-
         if (this.state.data.isSn) {
             param.isSn = this.state.data.isSn
         }
-
         if (this.state.data.isJk) {
             param.isJk = this.state.data.isJk
         }
-
         if (this.state.data.isLolita) {
             param.isLolita = this.state.data.isLolita
+        }
+
+        if (this.state.data.status != undefined) {
+            param.status = this.state.data.status
         }
 
         axios
@@ -950,6 +1009,18 @@ class InfoCardModal extends Component {
                                 value={this.state.data.remark}
                                 onChange={e => this.handleChange('remark', e.target.value)}
                             />
+                        </Form.Item>
+
+                        <Form.Item label='状态' name='status'>
+                            <Select
+                                value={this.state.data.status}
+                                onChange={value => this.handleChange('status', value)}>
+                                {statusOption.map(option => (
+                                    <Select.Option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Form>
                 </Modal>
