@@ -19,6 +19,7 @@ import {
 } from 'antd'
 import CustomBreadcrumb from '@/components/CustomBreadcrumb'
 import '@/style/view-style/table.scss'
+import '@/style/view-style/teacherForm.scss'
 import axios from '@/api'
 import { HOST } from '@/api/config.js'
 
@@ -201,6 +202,19 @@ class Root extends Component {
                                     <Input
                                         style={{ width: '50px' }}
                                         onChange={e => this.handleChange('heightLe', e.target.value)}
+                                    />
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    体重：
+                                    <Input
+                                        style={{ width: '50px' }}
+                                        onChange={e => this.handleChange('weightGe', e.target.value)}
+                                    />
+                                    &nbsp;-&nbsp;
+                                    <Input
+                                        style={{ width: '50px' }}
+                                        onChange={e => this.handleChange('weightLe', e.target.value)}
                                     />
                                 </span>
 
@@ -755,15 +769,23 @@ class InfoCardModal extends Component {
         if (this.state.data.height) {
             param.height = this.state.data.height
         }
+
+        if (this.state.data.weight) {
+            param.weight = this.state.data.weight
+        }
+
         if (this.state.data.kissType) {
             param.kissType = this.state.data.kissType
         }
+
         if (this.state.data.isSn) {
             param.isSn = this.state.data.isSn
         }
+
         if (this.state.data.isJk) {
             param.isJk = this.state.data.isJk
         }
+
         if (this.state.data.isLolita) {
             param.isLolita = this.state.data.isLolita
         }
@@ -854,10 +876,10 @@ class InfoCardModal extends Component {
                     okText='保存'
                     cancelText='取消'>
                     <Form {...layout} ref={this.formRef}>
-                        <Form.Item label='ID' name='id'>
+                        <Form.Item label='ID' name='id' className='form-item'>
                             <Input value={this.state.data.id} disabled />
                         </Form.Item>
-                        <Form.Item label='名字' name='nickname'>
+                        <Form.Item label='名字' name='nickname' className='form-item'>
                             <AutoComplete
                                 value={this.state.data.nickname}
                                 onChange={value => this.handleChange('nickname', value)}
@@ -879,31 +901,31 @@ class InfoCardModal extends Component {
                                 ))}
                             </AutoComplete>
                         </Form.Item>
-                        <Form.Item label='用户名' name='username'>
+                        <Form.Item label='用户名' name='username' className='form-item'>
                             <Input
                                 value={this.state.data.username}
                                 onChange={e => this.handleChange('username', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='频道地址' name='channelUsername'>
+                        <Form.Item label='频道地址' name='channelUsername' className='form-item'>
                             <Input
                                 value={this.state.data.channelUsername}
                                 onChange={e => this.handleChange('channelUsername', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='p价格' name='priceP'>
+                        <Form.Item label='p价格' name='priceP' className='form-item'>
                             <Input
                                 value={this.state.data.priceP}
                                 onChange={e => this.handleChange('priceP', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='pp价格' name='pricePp'>
+                        <Form.Item label='pp价格' name='pricePp' className='form-item'>
                             <Input
                                 value={this.state.data.pricePp}
                                 onChange={e => this.handleChange('pricePp', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='地区' name='region'>
+                        <Form.Item label='地区' name='region' className='form-item'>
                             <Select
                                 value={this.state.data.region}
                                 onChange={value => this.handleChange('region', value)}>
@@ -914,37 +936,26 @@ class InfoCardModal extends Component {
                                 ))}
                             </Select>
                         </Form.Item>
-                        <Form.Item label='年龄' name='age'>
+                        <Form.Item label='年龄' name='age' className='form-item'>
                             <Input
                                 value={this.state.data.age}
                                 onChange={e => this.handleChange('age', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='身高' name='height'>
+                        <Form.Item label='身高' name='height' className='form-item'>
                             <Input
                                 value={this.state.data.height}
                                 onChange={e => this.handleChange('height', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='体重' name='weight'>
+                        <Form.Item label='体重' name='weight' className='form-item'>
                             <Input
                                 value={this.state.data.weight}
                                 onChange={e => this.handleChange('weight', e.target.value)}
                             />
                         </Form.Item>
-                        {/* <Form.Item label='是否kiss' name='kissType'>
-                            <Select
-                                value={this.state.data.kissType}
-                                onChange={value => this.handleChange('kissType', value)}>
-                                {kissTypeOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item> */}
 
-                        <Form.Item label='是否kiss' name='kissType'>
+                        <Form.Item label='是否kiss' name='kissType' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.kissType}
                                 onChange={e => this.handleChange('kissType', e.target.value)}>
@@ -956,36 +967,43 @@ class InfoCardModal extends Component {
                             </Radio.Group>
                         </Form.Item>
 
-                        <Form.Item label='是否69' name='isSn'>
-                            <Select value={this.state.data.isSn} onChange={value => this.handleChange('isSn', value)}>
+                        <Form.Item label='是否69' name='isSn' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isSn}
+                                onChange={e => this.handleChange('isSn', e.target.value)}>
                                 {commonOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
+                                    <Radio key={option.value} value={option.value}>
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
-                        <Form.Item label='是否JK' name='isJk'>
-                            <Select value={this.state.data.isJk} onChange={value => this.handleChange('isJk', value)}>
+
+                        <Form.Item label='是否JK' name='isJk' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isJk}
+                                onChange={e => this.handleChange('isJk', e.target.value)}>
                                 {commonOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
+                                    <Radio key={option.value} value={option.value}>
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
-                        <Form.Item label='是否Lolita' name='isLolita'>
-                            <Select
+
+                        <Form.Item label='是否Lolita' name='isLolita' className='form-item'>
+                            <Radio.Group
                                 value={this.state.data.isLolita}
-                                onChange={value => this.handleChange('isLolita', value)}>
+                                onChange={e => this.handleChange('isLolita', e.target.value)}>
                                 {commonOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
+                                    <Radio key={option.value} value={option.value}>
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
-                        <Form.Item label='标签' name='tag'>
+
+                        <Form.Item label='标签' name='tag' className='form-item'>
                             <div>
                                 <Input
                                     value={data.tag}
@@ -1004,23 +1022,23 @@ class InfoCardModal extends Component {
                                 </div> */}
                             </div>
                         </Form.Item>
-                        <Form.Item label='备注' name='remark'>
+                        <Form.Item label='备注' name='remark' className='form-item'>
                             <Input
                                 value={this.state.data.remark}
                                 onChange={e => this.handleChange('remark', e.target.value)}
                             />
                         </Form.Item>
 
-                        <Form.Item label='状态' name='status'>
-                            <Select
+                        <Form.Item label='状态' name='status' className='form-item'>
+                            <Radio.Group
                                 value={this.state.data.status}
-                                onChange={value => this.handleChange('status', value)}>
+                                onChange={e => this.handleChange('status', e.target.value)}>
                                 {statusOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
+                                    <Radio key={option.value} value={option.value}>
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
                     </Form>
                 </Modal>
