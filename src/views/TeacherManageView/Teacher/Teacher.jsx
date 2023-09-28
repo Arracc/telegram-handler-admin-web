@@ -12,6 +12,7 @@ import {
     Form,
     Input,
     notification,
+    Radio,
     Select,
     List,
     AutoComplete
@@ -327,7 +328,7 @@ class TeacherTable extends Component {
                 pagination
             },
             () => {
-                this.queryPage(1, value)
+                this.queryPage(1, value, this.props.filters)
             }
         )
     }
@@ -335,7 +336,7 @@ class TeacherTable extends Component {
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/teacher/page'
+        let url = HOST + '/teacher/page'
         let param = {
             ...(pageIndex !== null ? { current: pageIndex } : {}),
             ...(pageSize !== null ? { size: pageSize } : {}),
@@ -474,6 +475,13 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '体重',
+            dataIndex: 'weight',
+            key: 'weight',
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: 'kiss',
             dataIndex: 'kissType',
             key: 'kissType',
@@ -559,14 +567,14 @@ class InfoCardModal extends Component {
         visible: false,
         id: 0,
         data: {},
-        tagOptions: [
-            { label: 'kiss', value: '#kiss' },
-            { label: '舌吻', value: '#舌吻' },
-            { label: '69', value: '#69' },
-            { label: '大车', value: '#大车' },
-            { label: 'JK', value: '#JK' },
-            { label: 'Lolita', value: '#Lolita' }
-        ],
+        // tagOptions: [
+        //     { label: 'kiss', value: '#kiss' },
+        //     { label: '舌吻', value: '#舌吻' },
+        //     { label: '69', value: '#69' },
+        //     { label: '大车', value: '#大车' },
+        //     { label: 'JK', value: '#JK' },
+        //     { label: 'Lolita', value: '#Lolita' }
+        // ],
         candidateList: [],
         showCandidateList: false,
         userId: null
@@ -618,7 +626,7 @@ class InfoCardModal extends Component {
                 })
             } else {
                 try {
-                    const response = await axios.get(HOST + '/admin/candidate/queryByName', {
+                    const response = await axios.get(HOST + '/candidate/queryByName', {
                         params: {
                             name: value
                         }
@@ -654,7 +662,7 @@ class InfoCardModal extends Component {
         console.log('handleOk')
         // 提交表单
         // 发送异步请求保存编辑后的数据
-        let url = HOST + '/admin/teacher/save'
+        let url = HOST + '/teacher/save'
         console.log('save:' + JSON.stringify(this.state.data))
         let param = {
             id: this.state.data.id,
@@ -684,15 +692,23 @@ class InfoCardModal extends Component {
         if (this.state.data.height) {
             param.height = this.state.data.height
         }
+
+        if (this.state.data.weight) {
+            param.height = this.state.data.weight
+        }
+
         if (this.state.data.kissType) {
             param.kissType = this.state.data.kissType
         }
+
         if (this.state.data.isSn) {
             param.isSn = this.state.data.isSn
         }
+
         if (this.state.data.isJk) {
             param.isJk = this.state.data.isJk
         }
+
         if (this.state.data.isLolita) {
             param.isLolita = this.state.data.isLolita
         }
@@ -737,7 +753,7 @@ class InfoCardModal extends Component {
 
     queryById = id => {
         this.setState({ loading: true })
-        let url = HOST + '/admin/teacher/queryById'
+        let url = HOST + '/teacher/queryById'
         let param = {
             id: id
         }
@@ -765,7 +781,7 @@ class InfoCardModal extends Component {
             wrapperCol: { span: 12 }
         }
 
-        const { data, tagOptions } = this.state
+        const { data } = this.state
 
         return (
             <>
@@ -851,7 +867,13 @@ class InfoCardModal extends Component {
                                 onChange={e => this.handleChange('height', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='是否kiss' name='kissType'>
+                        <Form.Item label='体重' name='weight'>
+                            <Input
+                                value={this.state.data.weight}
+                                onChange={e => this.handleChange('weight', e.target.value)}
+                            />
+                        </Form.Item>
+                        {/* <Form.Item label='是否kiss' name='kissType'>
                             <Select
                                 value={this.state.data.kissType}
                                 onChange={value => this.handleChange('kissType', value)}>
@@ -861,7 +883,20 @@ class InfoCardModal extends Component {
                                     </Select.Option>
                                 ))}
                             </Select>
+                        </Form.Item> */}
+
+                        <Form.Item label='是否kiss' name='kissType'>
+                            <Radio.Group
+                                value={this.state.data.kissType}
+                                onChange={e => this.handleChange('kissType', e.target.value)}>
+                                {kissTypeOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
                         </Form.Item>
+
                         <Form.Item label='是否69' name='isSn'>
                             <Select value={this.state.data.isSn} onChange={value => this.handleChange('isSn', value)}>
                                 {commonOption.map(option => (
@@ -898,7 +933,7 @@ class InfoCardModal extends Component {
                                     onChange={e => this.handleChange('tag', e.target.value)}
                                     placeholder='输入标签'
                                 />
-                                <div style={{ marginTop: '8px' }}>
+                                {/* <div style={{ marginTop: '8px' }}>
                                     {tagOptions.map(option => (
                                         <Tag
                                             key={option.value}
@@ -907,7 +942,7 @@ class InfoCardModal extends Component {
                                             {option.label}
                                         </Tag>
                                     ))}
-                                </div>
+                                </div> */}
                             </div>
                         </Form.Item>
                         <Form.Item label='备注' name='remark'>
