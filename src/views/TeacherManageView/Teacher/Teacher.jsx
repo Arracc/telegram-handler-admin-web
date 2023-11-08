@@ -19,7 +19,7 @@ import {
 import CustomBreadcrumb from '@/components/CustomBreadcrumb'
 import '@/style/view-style/table.scss'
 import axios from '@/api'
-import { HOST } from '@/api/config.js'
+import { HOST, PYHOST } from '@/api/config.js'
 
 const { Option } = Select
 
@@ -45,15 +45,27 @@ const kissTypeOption = [
     { label: '舌吻', value: 2 }
 ]
 
-const commonOption = [
+const haveNotOption = [
     { label: '\u00A0', value: null },
     { label: '无', value: 0 },
     { label: '有', value: 1 }
 ]
 
+const ifNotOption = [
+    { label: '\u00A0', value: null },
+    { label: '否', value: 0 },
+    { label: '是', value: 1 }
+]
+
 const commonShowOption = [
     { label: '\u00A0', value: null },
     { label: '×', value: 0 },
+    { label: '√', value: 1 }
+]
+
+const commonShowOption2 = [
+    { label: '\u00A0', value: null },
+    { label: '\u00A0', value: 0 },
     { label: '√', value: 1 }
 ]
 
@@ -239,7 +251,7 @@ class Root extends Component {
                                     <Select
                                         style={{ width: '50px' }}
                                         onChange={value => this.handleChange('isSn', value)}>
-                                        {commonOption.map(option => (
+                                        {haveNotOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>
@@ -252,7 +264,7 @@ class Root extends Component {
                                     <Select
                                         style={{ width: '50px' }}
                                         onChange={value => this.handleChange('isJk', value)}>
-                                        {commonOption.map(option => (
+                                        {haveNotOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>
@@ -265,7 +277,7 @@ class Root extends Component {
                                     <Select
                                         style={{ width: '50px' }}
                                         onChange={value => this.handleChange('isLolita', value)}>
-                                        {commonOption.map(option => (
+                                        {haveNotOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>
@@ -274,7 +286,20 @@ class Root extends Component {
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    状态
+                                    订阅：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isSubscribed', value)}>
+                                        {ifNotOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    状态：
                                     <Select
                                         style={{ width: '160px' }}
                                         mode="multiple" // 设置为多选模式
@@ -559,6 +584,17 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '订阅',
+            dataIndex: 'isSubscribed',
+            key: 'isSubscribed',
+            render: val => {
+                const selectedOption = commonShowOption2.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '标签',
             dataIndex: 'tag',
             key: 'tag',
@@ -632,7 +668,8 @@ class InfoCardModal extends Component {
         ],
         candidateList: [],
         showCandidateList: false,
-        userId: null
+        userId: null,
+        originalIsSubscribed: null
     }
 
     constructor(props) {
@@ -666,6 +703,14 @@ class InfoCardModal extends Component {
 
     handleChange = async (field, value) => {
         console.log(field + value)
+
+        // 如果是否订阅变更，记录原始值
+        if (field === 'isSubscribed') {
+            if (this.state.originalIsSubscribed == null) {
+                this.state.originalIsSubscribed = this.state.data.isSubscribed
+            }
+        }
+
         this.setState(prevState => ({
             data: {
                 ...prevState.data,
@@ -673,6 +718,7 @@ class InfoCardModal extends Component {
             }
         }))
 
+        // 昵称
         if (field === 'nickname') {
             if (value.trim() === '') {
                 this.setState({
@@ -717,7 +763,7 @@ class InfoCardModal extends Component {
         console.log('handleOk')
         // 提交表单
         // 发送异步请求保存编辑后的数据
-        let url = HOST + '/teacher/save'
+        let teacherSaveUrl = HOST + '/teacher/save'
         console.log('save:' + JSON.stringify(this.state.data))
         let param = {
             id: this.state.data.id,
@@ -764,12 +810,18 @@ class InfoCardModal extends Component {
             param.isLolita = this.state.data.isLolita
         }
 
+        if (this.state.data.isSubscribed != undefined) {
+            let orinalIsSubscribed = this.state.data.isSubscribed
+            param.isSubscribed = this.state.data.isSubscribed
+        }
+
         if (this.state.data.status != undefined) {
             param.status = this.state.data.status
         }
 
+        // 修改资料
         axios
-            .post(url, param)
+            .post(teacherSaveUrl, param)
             .then(res => {
                 if (res.data.code === 200 && res.data.data) {
                     notification.success({ message: '保存成功' })
@@ -786,6 +838,37 @@ class InfoCardModal extends Component {
             .catch(err => {
                 notification.success({ message: '保存失败' })
             })
+
+        // 触发订阅/取消订阅
+        if (this.state.originalIsSubscribed != param.isSubscribed) {
+            let type = param.isSubscribed == 1 ? 1 : 2
+            let channelUsername = param.channelUsername
+            channelUsername = channelUsername.replace("https://t.me/", "")
+            channelUsername = channelUsername.replace("@", "")
+            let param2 = {
+                "type": type,
+                "username": channelUsername
+            }
+            axios
+                .post(PYHOST + "/subscribeChannel", param2)
+                .then(res => {
+                    if (res.data.code === 200 && res.data.data) {
+                        notification.success({ message: '修改订阅成功' })
+                        // 关闭窗口
+                        // this.setState({
+                        //     visible: false
+                        // })
+                        // 重新查询当前页
+                        // this.props.refreshTable()
+                    } else {
+                        notification.success({ message: '修改订阅失败' })
+                    }
+                })
+                .catch(err => {
+                    notification.success({ message: '修改订阅失败' })
+                })
+        }
+
     }
 
     handleCancel = () => {
@@ -849,21 +932,14 @@ class InfoCardModal extends Component {
                     destroyOnClose={true}
                     okText='保存'
                     cancelText='取消'>
-                    <Form {...layout} ref={this.formRef}>
+                    <Form {...layout} ref={this.formRef} style={{ margin: "4px 0" }}>
                         <Form.Item label='ID' name='id'>
                             <Input value={this.state.data.id} disabled />
                         </Form.Item>
-                        <Form.Item label='名字' name='nickname'>
+                        <Form.Item label='名字' name='nickname' style={{ margin: "4px 0" }}>
                             <AutoComplete
                                 value={this.state.data.nickname}
-                                onChange={value => this.handleChange('nickname', value)}
-                            // dataSource={this.state.candidateList
-                            //     .map(candidate => ({
-                            //         value: candidate.id + ':' + candidate.nickname,
-                            //         key: candidate.id // 使用候选人的唯一标识作为 key
-                            //     }))
-                            // }
-                            >
+                                onChange={value => this.handleChange('nickname', value)}>
                                 {this.state.candidateList.map(candidate => (
                                     <AutoComplete.Option
                                         key={candidate.id}
@@ -875,31 +951,31 @@ class InfoCardModal extends Component {
                                 ))}
                             </AutoComplete>
                         </Form.Item>
-                        <Form.Item label='用户名' name='username'>
+                        <Form.Item label='用户名' name='username' style={{ margin: "4px 0" }}>
                             <Input
                                 value={this.state.data.username}
                                 onChange={e => this.handleChange('username', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='频道地址' name='channelUsername'>
+                        <Form.Item label='频道地址' name='channelUsername' style={{ margin: "4px 0" }}>
                             <Input
                                 value={this.state.data.channelUsername}
                                 onChange={e => this.handleChange('channelUsername', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='p价格' name='priceP'>
+                        <Form.Item label='p价格' name='priceP' style={{ margin: "4px 0" }}>
                             <Input
                                 value={this.state.data.priceP}
                                 onChange={e => this.handleChange('priceP', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='pp价格' name='pricePp'>
+                        <Form.Item label='pp价格' name='pricePp' style={{ margin: "4px 0" }}>
                             <Input
                                 value={this.state.data.pricePp}
                                 onChange={e => this.handleChange('pricePp', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='地区' name='region'>
+                        <Form.Item label='地区' name='region' style={{ margin: "4px 0" }}>
                             <Select
                                 value={this.state.data.region}
                                 onChange={value => this.handleChange('region', value)}>
@@ -910,19 +986,19 @@ class InfoCardModal extends Component {
                                 ))}
                             </Select>
                         </Form.Item>
-                        <Form.Item label='年龄' name='age'>
+                        <Form.Item label='年龄' name='age' style={{ margin: "4px 0" }}>
                             <Input
                                 value={this.state.data.age}
                                 onChange={e => this.handleChange('age', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='身高' name='height'>
+                        <Form.Item label='身高' name='height' style={{ margin: "4px 0" }}>
                             <Input
                                 value={this.state.data.height}
                                 onChange={e => this.handleChange('height', e.target.value)}
                             />
                         </Form.Item>
-                        <Form.Item label='是否kiss' name='kissType'>
+                        <Form.Item label='有无kiss' name='kissType' style={{ margin: "4px 0" }}>
                             <Select
                                 value={this.state.data.kissType}
                                 onChange={value => this.handleChange('kissType', value)}>
@@ -933,43 +1009,54 @@ class InfoCardModal extends Component {
                                 ))}
                             </Select>
                         </Form.Item>
-                        <Form.Item label='是否69' name='isSn'>
+                        <Form.Item label='有无69' name='isSn' style={{ margin: "4px 0" }}>
                             <Select value={this.state.data.isSn} onChange={value => this.handleChange('isSn', value)}>
-                                {commonOption.map(option => (
+                                {haveNotOption.map(option => (
                                     <Select.Option key={option.value} value={option.value}>
                                         {option.label}
                                     </Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
-                        <Form.Item label='是否JK' name='isJk'>
+                        <Form.Item label='有无JK' name='isJk' style={{ margin: "4px 0" }}>
                             <Select value={this.state.data.isJk} onChange={value => this.handleChange('isJk', value)}>
-                                {commonOption.map(option => (
+                                {haveNotOption.map(option => (
                                     <Select.Option key={option.value} value={option.value}>
                                         {option.label}
                                     </Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
-                        <Form.Item label='是否Lolita' name='isLolita'>
+                        <Form.Item label='有无Lolita' name='isLolita' style={{ margin: "4px 0" }}>
                             <Select
                                 value={this.state.data.isLolita}
                                 onChange={value => this.handleChange('isLolita', value)}>
-                                {commonOption.map(option => (
+                                {haveNotOption.map(option => (
                                     <Select.Option key={option.value} value={option.value}>
                                         {option.label}
                                     </Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
-                        <Form.Item label='标签' name='tag'>
+                        <Form.Item label='是否订阅' name='isSubscribed' style={{ margin: "4px 0" }}>
+                            <Select
+                                value={this.state.data.isSubscribed}
+                                onChange={value => this.handleChange('isSubscribed', value)}>
+                                {ifNotOption.map(option => (
+                                    <Select.Option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item label='标签' name='tag' style={{ margin: "4px 0" }}>
                             <div>
                                 <Input
                                     value={data.tag}
                                     onChange={e => this.handleChange('tag', e.target.value)}
                                     placeholder='输入标签'
                                 />
-                                <div style={{ marginTop: '8px' }}>
+                                {/* <div style={{ marginTop: '8px' }}>
                                     {tagOptions.map(option => (
                                         <Tag
                                             key={option.value}
@@ -978,17 +1065,17 @@ class InfoCardModal extends Component {
                                             {option.label}
                                         </Tag>
                                     ))}
-                                </div>
+                                </div> */}
                             </div>
                         </Form.Item>
-                        <Form.Item label='备注' name='remark'>
+                        <Form.Item label='备注' name='remark' style={{ margin: "4px 0" }}>
                             <Input
                                 value={this.state.data.remark}
                                 onChange={e => this.handleChange('remark', e.target.value)}
                             />
                         </Form.Item>
 
-                        <Form.Item label='状态' name='status'>
+                        <Form.Item label='状态' name='status' style={{ margin: "4px 0" }}>
                             <Select
                                 value={this.state.data.status}
                                 onChange={value => this.handleChange('status', value)}>
