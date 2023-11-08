@@ -12,12 +12,14 @@ import {
     Form,
     Input,
     notification,
+    Radio,
     Select,
     List,
     AutoComplete
 } from 'antd'
 import CustomBreadcrumb from '@/components/CustomBreadcrumb'
 import '@/style/view-style/table.scss'
+import '@/style/view-style/teacherForm.scss'
 import axios from '@/api'
 import { HOST, PYHOST } from '@/api/config.js'
 
@@ -104,7 +106,7 @@ class Root extends Component {
             ageLe: null,
             heightGe: null,
             heightLe: null,
-            tag: null,
+            tag: null
         }
     }
 
@@ -216,6 +218,19 @@ class Root extends Component {
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    体重：
+                                    <Input
+                                        style={{ width: '50px' }}
+                                        onChange={e => this.handleChange('weightGe', e.target.value)}
+                                    />
+                                    &nbsp;-&nbsp;
+                                    <Input
+                                        style={{ width: '50px' }}
+                                        onChange={e => this.handleChange('weightLe', e.target.value)}
+                                    />
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     地区：
                                     <Select
                                         style={{ width: '80px' }}
@@ -232,10 +247,10 @@ class Root extends Component {
                                     kiss：
                                     <Select
                                         style={{ width: '150px' }}
-                                        mode="multiple" // 设置为多选模式
+                                        mode='multiple' // 设置为多选模式
                                         onChange={values => this.handleChange('kissType', values)} // 注意这里的values是一个数组
                                     >
-                                        <Select.Option key="empty" value="">
+                                        <Select.Option key='empty' value=''>
                                             {/* 空白选项 */}
                                         </Select.Option>
                                         {kissTypeOption.map(option => (
@@ -302,10 +317,10 @@ class Root extends Component {
                                     状态：
                                     <Select
                                         style={{ width: '160px' }}
-                                        mode="multiple" // 设置为多选模式
+                                        mode='multiple' // 设置为多选模式
                                         onChange={values => this.handleChange('status', values)} // 注意这里的values是一个数组
                                     >
-                                        <Select.Option key="empty" value="">
+                                        <Select.Option key='empty' value=''>
                                             {/* 空白选项 */}
                                         </Select.Option>
                                         {statusOption.map(option => (
@@ -425,7 +440,7 @@ class TeacherTable extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => { })
+            .catch(err => {})
     }
 
     // 渲染数据
@@ -536,6 +551,13 @@ class TeacherTable extends Component {
             title: '身高',
             dataIndex: 'height',
             key: 'height',
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '体重',
+            dataIndex: 'weight',
+            key: 'weight',
             align: 'center',
             resizable: true // 允许调节列宽
         },
@@ -658,14 +680,14 @@ class InfoCardModal extends Component {
         visible: false,
         id: 0,
         data: {},
-        tagOptions: [
-            { label: 'kiss', value: '#kiss' },
-            { label: '舌吻', value: '#舌吻' },
-            { label: '69', value: '#69' },
-            { label: '大车', value: '#大车' },
-            { label: 'JK', value: '#JK' },
-            { label: 'Lolita', value: '#Lolita' }
-        ],
+        // tagOptions: [
+        //     { label: 'kiss', value: '#kiss' },
+        //     { label: '舌吻', value: '#舌吻' },
+        //     { label: '69', value: '#69' },
+        //     { label: '大车', value: '#大车' },
+        //     { label: 'JK', value: '#JK' },
+        //     { label: 'Lolita', value: '#Lolita' }
+        // ],
         candidateList: [],
         showCandidateList: false,
         userId: null,
@@ -794,19 +816,23 @@ class InfoCardModal extends Component {
             param.height = this.state.data.height
         }
 
-        if (this.state.data.kissType != undefined) {
+        if (this.state.data.weight) {
+            param.weight = this.state.data.weight
+        }
+
+        if (this.state.data.kissType) {
             param.kissType = this.state.data.kissType
         }
 
-        if (this.state.data.isSn != undefined) {
+        if (this.state.data.isSn) {
             param.isSn = this.state.data.isSn
         }
 
-        if (this.state.data.isJk != undefined) {
+        if (this.state.data.isJk) {
             param.isJk = this.state.data.isJk
         }
 
-        if (this.state.data.isLolita != undefined) {
+        if (this.state.data.isLolita) {
             param.isLolita = this.state.data.isLolita
         }
 
@@ -910,7 +936,7 @@ class InfoCardModal extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => { })
+            .catch(err => {})
     }
 
     render() {
@@ -919,7 +945,7 @@ class InfoCardModal extends Component {
             wrapperCol: { span: 12 }
         }
 
-        const { data, tagOptions } = this.state
+        const { data } = this.state
 
         return (
             <>
@@ -932,6 +958,7 @@ class InfoCardModal extends Component {
                     destroyOnClose={true}
                     okText='保存'
                     cancelText='取消'>
+<<<<<<< HEAD
                     <Form {...layout} ref={this.formRef} style={{ margin: "4px 0" }}>
                         <Form.Item label='ID' name='id'>
                             <Input value={this.state.data.id} disabled />
@@ -940,6 +967,23 @@ class InfoCardModal extends Component {
                             <AutoComplete
                                 value={this.state.data.nickname}
                                 onChange={value => this.handleChange('nickname', value)}>
+=======
+                    <Form {...layout} ref={this.formRef}>
+                        <Form.Item label='ID' name='id' className='form-item'>
+                            <Input value={this.state.data.id} disabled />
+                        </Form.Item>
+                        <Form.Item label='名字' name='nickname' className='form-item'>
+                            <AutoComplete
+                                value={this.state.data.nickname}
+                                onChange={value => this.handleChange('nickname', value)}
+                                // dataSource={this.state.candidateList
+                                //     .map(candidate => ({
+                                //         value: candidate.id + ':' + candidate.nickname,
+                                //         key: candidate.id // 使用候选人的唯一标识作为 key
+                                //     }))
+                                // }
+                            >
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                 {this.state.candidateList.map(candidate => (
                                     <AutoComplete.Option
                                         key={candidate.id}
@@ -951,31 +995,51 @@ class InfoCardModal extends Component {
                                 ))}
                             </AutoComplete>
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='用户名' name='username' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='用户名' name='username' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.username}
                                 onChange={e => this.handleChange('username', e.target.value)}
                             />
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='频道地址' name='channelUsername' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='频道地址' name='channelUsername' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.channelUsername}
                                 onChange={e => this.handleChange('channelUsername', e.target.value)}
                             />
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='p价格' name='priceP' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='p价格' name='priceP' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.priceP}
                                 onChange={e => this.handleChange('priceP', e.target.value)}
                             />
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='pp价格' name='pricePp' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='pp价格' name='pricePp' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.pricePp}
                                 onChange={e => this.handleChange('pricePp', e.target.value)}
                             />
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='地区' name='region' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='地区' name='region' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Select
                                 value={this.state.data.region}
                                 onChange={value => this.handleChange('region', value)}>
@@ -986,47 +1050,88 @@ class InfoCardModal extends Component {
                                 ))}
                             </Select>
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='年龄' name='age' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='年龄' name='age' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.age}
                                 onChange={e => this.handleChange('age', e.target.value)}
                             />
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='身高' name='height' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='身高' name='height' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.height}
                                 onChange={e => this.handleChange('height', e.target.value)}
                             />
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='有无kiss' name='kissType' style={{ margin: "4px 0" }}>
                             <Select
-                                value={this.state.data.kissType}
-                                onChange={value => this.handleChange('kissType', value)}>
-                                {kissTypeOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </Select.Option>
-                                ))}
-                            </Select>
+=======
+                        <Form.Item label='体重' name='weight' className='form-item'>
+                            <Input
+                                value={this.state.data.weight}
+                                onChange={e => this.handleChange('weight', e.target.value)}
+                            />
                         </Form.Item>
+
+                        <Form.Item label='是否kiss' name='kissType' className='form-item'>
+                            <Radio.Group
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
+                                value={this.state.data.kissType}
+                                onChange={e => this.handleChange('kissType', e.target.value)}>
+                                {kissTypeOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='有无69' name='isSn' style={{ margin: "4px 0" }}>
                             <Select value={this.state.data.isSn} onChange={value => this.handleChange('isSn', value)}>
                                 {haveNotOption.map(option => (
                                     <Select.Option key={option.value} value={option.value}>
+=======
+
+                        <Form.Item label='是否69' name='isSn' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isSn}
+                                onChange={e => this.handleChange('isSn', e.target.value)}>
+                                {commonOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='有无JK' name='isJk' style={{ margin: "4px 0" }}>
                             <Select value={this.state.data.isJk} onChange={value => this.handleChange('isJk', value)}>
                                 {haveNotOption.map(option => (
                                     <Select.Option key={option.value} value={option.value}>
+=======
+
+                        <Form.Item label='是否JK' name='isJk' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isJk}
+                                onChange={e => this.handleChange('isJk', e.target.value)}>
+                                {commonOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='有无Lolita' name='isLolita' style={{ margin: "4px 0" }}>
                             <Select
                                 value={this.state.data.isLolita}
@@ -1044,12 +1149,26 @@ class InfoCardModal extends Component {
                                 onChange={value => this.handleChange('isSubscribed', value)}>
                                 {ifNotOption.map(option => (
                                     <Select.Option key={option.value} value={option.value}>
+=======
+
+                        <Form.Item label='是否Lolita' name='isLolita' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isLolita}
+                                onChange={e => this.handleChange('isLolita', e.target.value)}>
+                                {commonOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='标签' name='tag' style={{ margin: "4px 0" }}>
+=======
+
+                        <Form.Item label='标签' name='tag' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <div>
                                 <Input
                                     value={data.tag}
@@ -1068,23 +1187,32 @@ class InfoCardModal extends Component {
                                 </div> */}
                             </div>
                         </Form.Item>
+<<<<<<< HEAD
                         <Form.Item label='备注' name='remark' style={{ margin: "4px 0" }}>
+=======
+                        <Form.Item label='备注' name='remark' className='form-item'>
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.remark}
                                 onChange={e => this.handleChange('remark', e.target.value)}
                             />
                         </Form.Item>
 
+<<<<<<< HEAD
                         <Form.Item label='状态' name='status' style={{ margin: "4px 0" }}>
                             <Select
+=======
+                        <Form.Item label='状态' name='status' className='form-item'>
+                            <Radio.Group
+>>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                 value={this.state.data.status}
-                                onChange={value => this.handleChange('status', value)}>
+                                onChange={e => this.handleChange('status', e.target.value)}>
                                 {statusOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
+                                    <Radio key={option.value} value={option.value}>
                                         {option.label}
-                                    </Select.Option>
+                                    </Radio>
                                 ))}
-                            </Select>
+                            </Radio.Group>
                         </Form.Item>
                     </Form>
                 </Modal>
