@@ -349,6 +349,7 @@ class Root extends Component {
                                     filters={this.state.search}
                                     ref={node => (this.TeacherTable = node)}
                                     showInfoCard={data => this.showInfoCard(data)}
+                                    refreshTable={() => this.refreshTable()}
                                 />
                             </div>
                         </div>
@@ -656,11 +657,24 @@ class TeacherTable extends Component {
             title: '操作',
             render: (text, record, index) => {
                 return (
-                    <span>
-                        <Button type='button' onClick={() => this.edit(record)}>
-                            编辑
-                        </Button>
-                    </span>
+                    <div>
+                        <span>
+                            <Button type='button' onClick={() => this.edit(record)}>
+                                编辑
+                            </Button>
+                        </span>
+                        <span style={{ marginLeft: '10px' }}></span> {/* 这里设置了10px的左边距作为按钮间隔 */}
+                        <span>
+                            <Button
+                                className='subscribeButton'
+                                type='button'
+                                onClick={() =>
+                                    this.subscribe(record.id, record.isSubscribed === 0 ? 1 : 0, record.channelUsername)
+                                }>
+                                {record.isSubscribed === 0 ? '订阅' : '取消订阅'}
+                            </Button>
+                        </span>
+                    </div>
                 )
             },
             align: 'center',
@@ -671,6 +685,53 @@ class TeacherTable extends Component {
     // 弹出用户连接列表窗口
     edit = record => {
         this.props.showInfoCard(record.id)
+    }
+
+    // 订阅
+    subscribe = (id, type, username) => {
+        username = username.replace('https://t.me/', '')
+        username = username.replace('@', '')
+        let param = {
+            type: type,
+            username: username
+        }
+        // 提交
+        axios
+            .post(PYHOST + '/subscribeChannel', param)
+            .then(res => {
+                if (res.data.code === 200 && res.data.data) {
+                    notification.success({ message: '修改订阅成功' })
+                    // 修改成功后，修改资料
+                    this.updateInfo(id, type)
+                } else {
+                    notification.success({ message: '修改订阅失败' })
+                }
+            })
+            .catch(err => {
+                notification.success({ message: '修改订阅失败' })
+            })
+    }
+
+    updateInfo = (id, isSubscriebd) => {
+        let param = {
+            id: id,
+            isSubscribed: isSubscriebd
+        }
+        let teacherSaveUrl = HOST + '/teacher/save'
+        axios
+            .post(teacherSaveUrl, param)
+            .then(res => {
+                if (res.data.code === 200 && res.data.data) {
+                    notification.success({ message: '保存成功' })
+                    // 重新查询当前页
+                    this.props.refreshTable()
+                } else {
+                    notification.success({ message: '保存失败' })
+                }
+            })
+            .catch(err => {
+                notification.success({ message: '保存失败' })
+            })
     }
 }
 
@@ -724,14 +785,7 @@ class InfoCardModal extends Component {
     }
 
     handleChange = async (field, value) => {
-        console.log(field + value)
-
-        // 如果是否订阅变更，记录原始值
-        if (field === 'isSubscribed') {
-            if (this.state.originalIsSubscribed == null) {
-                this.state.originalIsSubscribed = this.state.data.isSubscribed
-            }
-        }
+        console.log(field + ': ' + value)
 
         this.setState(prevState => ({
             data: {
@@ -866,20 +920,28 @@ class InfoCardModal extends Component {
             })
 
         // 触发订阅/取消订阅
+        console.log(
+            '提交修改 isSubscribed 原始值' + this.state.originalIsSubscribed + ', 提交值：' + param.isSubscribed
+        )
         if (this.state.originalIsSubscribed != param.isSubscribed) {
             let type = param.isSubscribed == 1 ? 1 : 2
-            let channelUsername = param.channelUsername
-            channelUsername = channelUsername.replace("https://t.me/", "")
-            channelUsername = channelUsername.replace("@", "")
-            let param2 = {
-                "type": type,
-                "username": channelUsername
+            let username = param.channelUsername
+            username = username.replace('https://t.me/', '')
+            username = username.replace('@', '')
+            let subscribeParam = {
+                type: type,
+                username: username
             }
+
+            // 提交
             axios
-                .post(PYHOST + "/subscribeChannel", param2)
+                .post(PYHOST + '/subscribeChannel', subscribeParam)
                 .then(res => {
                     if (res.data.code === 200 && res.data.data) {
                         notification.success({ message: '修改订阅成功' })
+                        // 清空originalIsSubscribed
+                        // console.log("清空originalIsSubscribed")
+                        // this.state.originalIsSubscribed = null
                         // 关闭窗口
                         // this.setState({
                         //     visible: false
@@ -894,7 +956,6 @@ class InfoCardModal extends Component {
                     notification.success({ message: '修改订阅失败' })
                 })
         }
-
     }
 
     handleCancel = () => {
@@ -929,7 +990,8 @@ class InfoCardModal extends Component {
                     this.setState({
                         loading: false,
                         data: res.data.data,
-                        id: res.data.data.id
+                        id: res.data.data.id,
+                        originalIsSubscribed: res.data.data.isSubscribed
                     })
                 } else {
                     // 这里处理一些错误信息
@@ -957,17 +1019,8 @@ class InfoCardModal extends Component {
                     onCancel={this.handleCancel}
                     destroyOnClose={true}
                     okText='保存'
-                    cancelText='取消'>
-<<<<<<< HEAD
-                    <Form {...layout} ref={this.formRef} style={{ margin: "4px 0" }}>
-                        <Form.Item label='ID' name='id'>
-                            <Input value={this.state.data.id} disabled />
-                        </Form.Item>
-                        <Form.Item label='名字' name='nickname' style={{ margin: "4px 0" }}>
-                            <AutoComplete
-                                value={this.state.data.nickname}
-                                onChange={value => this.handleChange('nickname', value)}>
-=======
+                    cancelText='取消'
+                    style={{ top: 10, left: 20, right: 20, bottom: 10 }}>
                     <Form {...layout} ref={this.formRef}>
                         <Form.Item label='ID' name='id' className='form-item'>
                             <Input value={this.state.data.id} disabled />
@@ -975,15 +1028,7 @@ class InfoCardModal extends Component {
                         <Form.Item label='名字' name='nickname' className='form-item'>
                             <AutoComplete
                                 value={this.state.data.nickname}
-                                onChange={value => this.handleChange('nickname', value)}
-                                // dataSource={this.state.candidateList
-                                //     .map(candidate => ({
-                                //         value: candidate.id + ':' + candidate.nickname,
-                                //         key: candidate.id // 使用候选人的唯一标识作为 key
-                                //     }))
-                                // }
-                            >
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
+                                onChange={value => this.handleChange('nickname', value)}>
                                 {this.state.candidateList.map(candidate => (
                                     <AutoComplete.Option
                                         key={candidate.id}
@@ -995,51 +1040,31 @@ class InfoCardModal extends Component {
                                 ))}
                             </AutoComplete>
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='用户名' name='username' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='用户名' name='username' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.username}
                                 onChange={e => this.handleChange('username', e.target.value)}
                             />
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='频道地址' name='channelUsername' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='频道地址' name='channelUsername' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.channelUsername}
                                 onChange={e => this.handleChange('channelUsername', e.target.value)}
                             />
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='p价格' name='priceP' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='p价格' name='priceP' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.priceP}
                                 onChange={e => this.handleChange('priceP', e.target.value)}
                             />
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='pp价格' name='pricePp' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='pp价格' name='pricePp' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.pricePp}
                                 onChange={e => this.handleChange('pricePp', e.target.value)}
                             />
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='地区' name='region' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='地区' name='region' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Select
                                 value={this.state.data.region}
                                 onChange={value => this.handleChange('region', value)}>
@@ -1050,40 +1075,26 @@ class InfoCardModal extends Component {
                                 ))}
                             </Select>
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='年龄' name='age' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='年龄' name='age' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.age}
                                 onChange={e => this.handleChange('age', e.target.value)}
                             />
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='身高' name='height' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='身高' name='height' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.height}
                                 onChange={e => this.handleChange('height', e.target.value)}
                             />
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='有无kiss' name='kissType' style={{ margin: "4px 0" }}>
-                            <Select
-=======
                         <Form.Item label='体重' name='weight' className='form-item'>
                             <Input
                                 value={this.state.data.weight}
                                 onChange={e => this.handleChange('weight', e.target.value)}
                             />
                         </Form.Item>
-
-                        <Form.Item label='是否kiss' name='kissType' className='form-item'>
+                        <Form.Item label='有无kiss' name='kissType' className='form-item'>
                             <Radio.Group
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                 value={this.state.data.kissType}
                                 onChange={e => this.handleChange('kissType', e.target.value)}>
                                 {kissTypeOption.map(option => (
@@ -1093,82 +1104,51 @@ class InfoCardModal extends Component {
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='有无69' name='isSn' style={{ margin: "4px 0" }}>
-                            <Select value={this.state.data.isSn} onChange={value => this.handleChange('isSn', value)}>
-                                {haveNotOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
-=======
-
-                        <Form.Item label='是否69' name='isSn' className='form-item'>
+                        <Form.Item label='有无69' name='isSn' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isSn}
                                 onChange={e => this.handleChange('isSn', e.target.value)}>
-                                {commonOption.map(option => (
+                                {haveNotOption.map(option => (
                                     <Radio key={option.value} value={option.value}>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                         {option.label}
                                     </Radio>
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='有无JK' name='isJk' style={{ margin: "4px 0" }}>
-                            <Select value={this.state.data.isJk} onChange={value => this.handleChange('isJk', value)}>
-                                {haveNotOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
-=======
-
-                        <Form.Item label='是否JK' name='isJk' className='form-item'>
+                        <Form.Item label='有无JK' name='isJk' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isJk}
                                 onChange={e => this.handleChange('isJk', e.target.value)}>
-                                {commonOption.map(option => (
+                                {haveNotOption.map(option => (
                                     <Radio key={option.value} value={option.value}>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                         {option.label}
                                     </Radio>
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='有无Lolita' name='isLolita' style={{ margin: "4px 0" }}>
-                            <Select
-                                value={this.state.data.isLolita}
-                                onChange={value => this.handleChange('isLolita', value)}>
-                                {haveNotOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                        <Form.Item label='是否订阅' name='isSubscribed' style={{ margin: "4px 0" }}>
-                            <Select
-                                value={this.state.data.isSubscribed}
-                                onChange={value => this.handleChange('isSubscribed', value)}>
-                                {ifNotOption.map(option => (
-                                    <Select.Option key={option.value} value={option.value}>
-=======
-
-                        <Form.Item label='是否Lolita' name='isLolita' className='form-item'>
+                        <Form.Item label='有无Lolita' name='isLolita' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isLolita}
                                 onChange={e => this.handleChange('isLolita', e.target.value)}>
-                                {commonOption.map(option => (
+                                {haveNotOption.map(option => (
                                     <Radio key={option.value} value={option.value}>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                         {option.label}
                                     </Radio>
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='标签' name='tag' style={{ margin: "4px 0" }}>
-=======
-
+                        <Form.Item label='是否订阅' name='isSubscribed' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isSubscribed}
+                                onChange={e => this.handleChange('isSubscribed', e.target.value)}>
+                                {ifNotOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
                         <Form.Item label='标签' name='tag' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <div>
                                 <Input
                                     value={data.tag}
@@ -1187,24 +1167,15 @@ class InfoCardModal extends Component {
                                 </div> */}
                             </div>
                         </Form.Item>
-<<<<<<< HEAD
-                        <Form.Item label='备注' name='remark' style={{ margin: "4px 0" }}>
-=======
                         <Form.Item label='备注' name='remark' className='form-item'>
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                             <Input
                                 value={this.state.data.remark}
                                 onChange={e => this.handleChange('remark', e.target.value)}
                             />
                         </Form.Item>
 
-<<<<<<< HEAD
-                        <Form.Item label='状态' name='status' style={{ margin: "4px 0" }}>
-                            <Select
-=======
                         <Form.Item label='状态' name='status' className='form-item'>
                             <Radio.Group
->>>>>>> 617e4b8a7463a1fc5e0757ec925514415838431f
                                 value={this.state.data.status}
                                 onChange={e => this.handleChange('status', e.target.value)}>
                                 {statusOption.map(option => (
