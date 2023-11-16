@@ -441,7 +441,7 @@ class TeacherTable extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => {})
+            .catch(err => { })
     }
 
     // 渲染数据
@@ -618,6 +618,20 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '首日访问量',
+            dataIndex: 'channel1dViews',
+            key: 'channel1dViews',
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '订阅数',
+            dataIndex: 'channelMembers',
+            key: 'channelMembers',
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '标签',
             dataIndex: 'tag',
             key: 'tag',
@@ -765,6 +779,7 @@ class InfoCardModal extends Component {
             this.setState({
                 visible: true,
                 id: id,
+                originalIsSubscribed: null,
                 data: {}
             })
         } else if (id !== this.state.id) {
@@ -773,7 +788,8 @@ class InfoCardModal extends Component {
             this.setState({
                 loading: true,
                 visible: true,
-                id: id
+                id: id,
+                originalIsSubscribed: null,
             })
             this.queryById(id)
         } else {
@@ -848,6 +864,7 @@ class InfoCardModal extends Component {
             channelUsername: this.state.data.channelUsername || '',
             priceComplete: this.state.data.priceComplete || '',
             region: this.state.data.region || '',
+            isSubscribed: this.state.data.isSubscribed || 0,
             tag: this.state.data.tag || '',
             remark: this.state.data.remark || ''
         }
@@ -891,7 +908,6 @@ class InfoCardModal extends Component {
         }
 
         if (this.state.data.isSubscribed != undefined) {
-            let orinalIsSubscribed = this.state.data.isSubscribed
             param.isSubscribed = this.state.data.isSubscribed
         }
 
@@ -923,7 +939,7 @@ class InfoCardModal extends Component {
         console.log(
             '提交修改 isSubscribed 原始值' + this.state.originalIsSubscribed + ', 提交值：' + param.isSubscribed
         )
-        if (this.state.originalIsSubscribed != param.isSubscribed) {
+        if ((this.state.originalIsSubscribed == null && param.isSubscribed == 1) || (this.state.originalIsSubscribed != null && this.state.originalIsSubscribed != param.isSubscribed)) {
             let type = param.isSubscribed == 1 ? 1 : 2
             let username = param.channelUsername
             username = username.replace('https://t.me/', '')
@@ -998,7 +1014,7 @@ class InfoCardModal extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => {})
+            .catch(err => { })
     }
 
     render() {
