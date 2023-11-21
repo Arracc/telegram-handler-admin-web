@@ -15,7 +15,9 @@ import {
     Radio,
     Select,
     List,
-    AutoComplete
+    AutoComplete,
+    Tooltip,
+    message
 } from 'antd'
 import CustomBreadcrumb from '@/components/CustomBreadcrumb'
 import '@/style/view-style/table.scss'
@@ -83,8 +85,8 @@ const statusOption = [
 const lastSeenOption = [
     { label: '\u00A0', value: null },
     { label: '最近', value: 1 },
-    { label: '一周前', value: 2 },
-    { label: '一个月前', value: 3 },
+    { label: '一周内', value: 2 },
+    { label: '一个月内', value: 3 },
     { label: '很久之前', value: 4 }
 ]
 
@@ -511,14 +513,52 @@ class TeacherTable extends Component {
             dataIndex: 'username',
             key: 'username',
             align: 'center',
-            resizable: true // 允许调节列宽
+            resizable: true, // 允许调节列宽
+            render: text => (
+                <Tooltip
+                    title={
+                        <div
+                            onClick={async () => {
+                                const formattedText = text.replace('@', '')
+                                try {
+                                    await navigator.clipboard.writeText(`https://t.me/${formattedText}`)
+                                    message.success('链接已复制到剪贴板')
+                                } catch (err) {
+                                    message.error('链接复制失败')
+                                }
+                            }}>
+                            {`https://t.me/${text.replace('@', '')}`}
+                        </div>
+                    }>
+                    {text}
+                </Tooltip>
+            )
         },
         {
             title: '频道地址',
             dataIndex: 'channelUsername',
             key: 'channelUsername',
             align: 'center',
-            resizable: true // 允许调节列宽
+            resizable: true, // 允许调节列宽
+            render: text => (
+                <Tooltip
+                    title={
+                        <div
+                            onClick={async () => {
+                                const formattedText = text.replace('@', '')
+                                try {
+                                    await navigator.clipboard.writeText(`https://t.me/${formattedText}`)
+                                    message.success('链接已复制到剪贴板')
+                                } catch (err) {
+                                    message.error('链接复制失败')
+                                }
+                            }}>
+                            {`https://t.me/${text.replace('@', '')}`}
+                        </div>
+                    }>
+                    {text}
+                </Tooltip>
+            )
         },
         {
             title: 'p价格',
