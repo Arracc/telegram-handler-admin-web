@@ -391,16 +391,71 @@ class TeacherTable extends Component {
 
     // 数据变化处理
     handleTableChange = (pagination, filters, sorter) => {
-        this.setState(
-            {
-                pagination
-            },
-            () => {
-                filters = this.props.filters
-                console.log('触发分页数据变化: ' + JSON.stringify(filters))
-                this.queryPage(pagination.current, pagination.size, filters)
+        // 如果filters为空，则使用props中的filters
+        if (filters == null) {
+            filters = this.props.filters
+        }
+
+        // 创建一个新的查询条件对象
+        let param = { ...filters }
+
+        // 如果sorter不为空，则处理排序逻辑
+        if (sorter != null) {
+            // 根据sortOrder的值来决定传递给后端的参数
+            let sortParam
+            console.log('sorter:' + JSON.stringify(sorter))
+            if (sorter.columnKey == 'priceP') {
+                if (sorter.order === 'ascend') {
+                    sortParam = 1 // 升序
+                } else if (sorter.order === 'descend') {
+                    sortParam = 2 // 降序
+                } else {
+                    sortParam = null // 不排序
+                }
+            } else if (sorter.columnKey == 'height') {
+                if (sorter.order === 'ascend') {
+                    sortParam = 3 // 升序
+                } else if (sorter.order === 'descend') {
+                    sortParam = 4 // 降序
+                } else {
+                    sortParam = null // 不排序
+                }
+            } else if (sorter.columnKey == 'weight') {
+                if (sorter.order === 'ascend') {
+                    sortParam = 5 // 升序
+                } else if (sorter.order === 'descend') {
+                    sortParam = 6 // 降序
+                } else {
+                    sortParam = null // 不排序
+                }
+            } else if (sorter.columnKey == 'channel1dViews') {
+                if (sorter.order === 'ascend') {
+                    sortParam = 7 // 升序
+                } else if (sorter.order === 'descend') {
+                    sortParam = 8 // 降序
+                } else {
+                    sortParam = null // 不排序
+                }
+            } else if (sorter.columnKey == 'channelMembers') {
+                if (sorter.order === 'ascend') {
+                    sortParam = 9 // 升序
+                } else if (sorter.order === 'descend') {
+                    sortParam = 10 // 降序
+                } else {
+                    sortParam = null // 不排序
+                }
             }
-        )
+
+            // 将排序条件加入查询条件
+            param.orderBy = sortParam
+        }
+
+        // 更新state中的pagination
+        this.setState({ pagination }, () => {
+            console.log('触发查询条件数据变化: ' + JSON.stringify(pagination) + ',' + JSON.stringify(param))
+            // 请求接口
+            this.queryPage(pagination.current, pagination.size, param)
+        })
     }
 
     handlePageSizeChange = value => {
@@ -443,7 +498,7 @@ class TeacherTable extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => { })
+            .catch(err => {})
     }
 
     // 渲染数据
@@ -561,14 +616,15 @@ class TeacherTable extends Component {
             )
         },
         {
-            title: 'p价格',
+            title: 'p',
             dataIndex: 'priceP',
             key: 'priceP',
             align: 'center',
-            resizable: true // 允许调节列宽
+            resizable: true, // 允许调节列宽
+            sorter: true
         },
         {
-            title: 'pp价格',
+            title: 'pp',
             dataIndex: 'pricePp',
             key: 'pricePp',
             align: 'center',
@@ -593,14 +649,16 @@ class TeacherTable extends Component {
             dataIndex: 'height',
             key: 'height',
             align: 'center',
-            resizable: true // 允许调节列宽
+            resizable: true,
+            sorter: true
         },
         {
             title: '体重',
             dataIndex: 'weight',
             key: 'weight',
             align: 'center',
-            resizable: true // 允许调节列宽
+            resizable: true,
+            sorter: true
         },
         {
             title: 'kiss',
@@ -662,14 +720,16 @@ class TeacherTable extends Component {
             dataIndex: 'channel1dViews',
             key: 'channel1dViews',
             align: 'center',
-            resizable: true // 允许调节列宽
+            resizable: true,
+            sorter: true
         },
         {
             title: '订阅数',
             dataIndex: 'channelMembers',
             key: 'channelMembers',
             align: 'center',
-            resizable: true // 允许调节列宽
+            resizable: true,
+            sorter: true
         },
         {
             title: '标签',
@@ -829,7 +889,7 @@ class InfoCardModal extends Component {
                 loading: true,
                 visible: true,
                 id: id,
-                originalIsSubscribed: null,
+                originalIsSubscribed: null
             })
             this.queryById(id)
         } else {
@@ -979,7 +1039,10 @@ class InfoCardModal extends Component {
         console.log(
             '提交修改 isSubscribed 原始值' + this.state.originalIsSubscribed + ', 提交值：' + param.isSubscribed
         )
-        if ((this.state.originalIsSubscribed == null && param.isSubscribed == 1) || (this.state.originalIsSubscribed != null && this.state.originalIsSubscribed != param.isSubscribed)) {
+        if (
+            (this.state.originalIsSubscribed == null && param.isSubscribed == 1) ||
+            (this.state.originalIsSubscribed != null && this.state.originalIsSubscribed != param.isSubscribed)
+        ) {
             let type = param.isSubscribed == 1 ? 1 : 2
             let username = param.channelUsername
             username = username.replace('https://t.me/', '')
@@ -1054,7 +1117,7 @@ class InfoCardModal extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => { })
+            .catch(err => {})
     }
 
     render() {
