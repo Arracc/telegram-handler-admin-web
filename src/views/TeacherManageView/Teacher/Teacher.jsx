@@ -108,6 +108,8 @@ class Root extends Component {
             ageLe: null,
             heightGe: null,
             heightLe: null,
+            status: null,
+            orderBy: null,
             tag: null
         }
     }
@@ -144,6 +146,12 @@ class Root extends Component {
             this.TeacherTable.state.pagination.size,
             search
         )
+    }
+
+    changeStateOrderBy = value => {
+        this.setState({
+            orderBy: value
+        })
     }
 
     render() {
@@ -352,6 +360,7 @@ class Root extends Component {
                                     ref={node => (this.TeacherTable = node)}
                                     showInfoCard={data => this.showInfoCard(data)}
                                     refreshTable={() => this.refreshTable()}
+                                    changeStateOrderBy={value => this.changeStateOrderBy(value)}
                                 />
                             </div>
                         </div>
@@ -391,19 +400,10 @@ class TeacherTable extends Component {
 
     // 数据变化处理
     handleTableChange = (pagination, filters, sorter) => {
-        // 如果filters为空，则使用props中的filters
-        if (filters == null) {
-            filters = this.props.filters
-        }
-
-        // 创建一个新的查询条件对象
-        let param = { ...filters }
-
         // 如果sorter不为空，则处理排序逻辑
         if (sorter != null) {
             // 根据sortOrder的值来决定传递给后端的参数
             let sortParam
-            console.log('sorter:' + JSON.stringify(sorter))
             if (sorter.columnKey == 'priceP') {
                 if (sorter.order === 'ascend') {
                     sortParam = 1 // 升序
@@ -444,17 +444,14 @@ class TeacherTable extends Component {
                 } else {
                     sortParam = null // 不排序
                 }
+                this.props.changeStateOrderBy(sortParam)
             }
-
-            // 将排序条件加入查询条件
-            param.orderBy = sortParam
         }
 
         // 更新state中的pagination
         this.setState({ pagination }, () => {
-            console.log('触发查询条件数据变化: ' + JSON.stringify(pagination) + ',' + JSON.stringify(param))
             // 请求接口
-            this.queryPage(pagination.current, pagination.size, param)
+            this.queryPage(pagination.current, pagination.size, this.props.filters)
         })
     }
 
@@ -570,22 +567,19 @@ class TeacherTable extends Component {
             align: 'center',
             resizable: true, // 允许调节列宽
             render: text => (
-                <Tooltip
-                    title={
-                        <div
-                            onClick={async () => {
-                                const formattedText = text.replace('@', '')
-                                try {
-                                    await navigator.clipboard.writeText(`https://t.me/${formattedText}`)
-                                    message.success('链接已复制到剪贴板')
-                                } catch (err) {
-                                    message.error('链接复制失败')
-                                }
-                            }}>
-                            {`https://t.me/${text.replace('@', '')}`}
-                        </div>
-                    }>
-                    {text}
+                <Tooltip title={text}>
+                    <div
+                        onClick={async () => {
+                            const formattedText = `https://t.me/${text.replace('@', '')}`
+                            try {
+                                await navigator.clipboard.writeText(formattedText)
+                                message.success('链接已复制到剪贴板')
+                            } catch (err) {
+                                message.error('链接复制失败')
+                            }
+                        }}>
+                        {text}
+                    </div>
                 </Tooltip>
             )
         },
@@ -596,22 +590,19 @@ class TeacherTable extends Component {
             align: 'center',
             resizable: true, // 允许调节列宽
             render: text => (
-                <Tooltip
-                    title={
-                        <div
-                            onClick={async () => {
-                                const formattedText = text.replace('@', '')
-                                try {
-                                    await navigator.clipboard.writeText(`https://t.me/${formattedText}`)
-                                    message.success('链接已复制到剪贴板')
-                                } catch (err) {
-                                    message.error('链接复制失败')
-                                }
-                            }}>
-                            {`https://t.me/${text.replace('@', '')}`}
-                        </div>
-                    }>
-                    {text}
+                <Tooltip title={text}>
+                    <div
+                        onClick={async () => {
+                            const formattedText = `https://t.me/${text.replace('@', '')}`
+                            try {
+                                await navigator.clipboard.writeText(formattedText)
+                                message.success('链接已复制到剪贴板')
+                            } catch (err) {
+                                message.error('链接复制失败')
+                            }
+                        }}>
+                        {text}
+                    </div>
                 </Tooltip>
             )
         },
