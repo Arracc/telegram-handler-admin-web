@@ -76,10 +76,8 @@ const commonShowOption2 = [
 const statusOption = [
     { label: '\u00A0', value: null },
     { label: '正常', value: 1 },
-    { label: '暂离', value: 2 },
-    { label: '失联', value: 3 },
-    { label: '上岸', value: 4 },
-    { label: '失效', value: 5 }
+    { label: '上岸', value: 2 },
+    { label: '失效', value: 3 }
 ]
 
 const lastSeenOption = [
@@ -109,6 +107,7 @@ class Root extends Component {
             heightGe: null,
             heightLe: null,
             status: null,
+            lastSeen: null,
             orderBy: null,
             tag: null
         }
@@ -334,6 +333,24 @@ class Root extends Component {
                                             {/* 空白选项 */}
                                         </Select.Option>
                                         {statusOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    最后在线：
+                                    <Select
+                                        style={{ width: '160px' }}
+                                        mode='multiple' // 设置为多选模式
+                                        onChange={values => this.handleChange('lastSeen', values)} // 注意这里的values是一个数组
+                                    >
+                                        <Select.Option key='empty' value=''>
+                                            {/* 空白选项 */}
+                                        </Select.Option>
+                                        {lastSeenOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>

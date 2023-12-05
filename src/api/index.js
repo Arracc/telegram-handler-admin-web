@@ -1,10 +1,10 @@
 import axios from 'axios'
 
-import { message, Button } from 'antd';
+import { message } from 'antd'
 
-import { createHashHistory } from 'history';
+import { createHashHistory } from 'history'
 
-const history = createHashHistory();
+const history = createHashHistory()
 
 const instance = axios.create({
     timeout: 5000
@@ -16,9 +16,16 @@ instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlenco
 // 添加请求拦截器
 instance.interceptors.request.use(
     config => {
-        let token = localStorage.getItem('token');
-        // 将 token 添加到请求头
+        // // 从本地获取 Authorization
+        const token = localStorage.getItem('token')
+        console.log('axios请求前取出token:' + token)
+
+        // // 在请求头中添加 Authorization
         token && (config.headers.Authorization = token)
+        // if (authorization) {
+        //     instance.defaults.headers.common['Authorization'] = authorization;
+        //     config.headers.Authorization = token
+        // }
         return config
     },
     error => {
@@ -41,8 +48,8 @@ instance.interceptors.response.use(
         switch (error.response.status) {
             case 401:
                 // 未登录处理
-                proceedNotLogined();
-                return Promise.reject(error.response);
+                proceedNotLogined()
+                return Promise.reject(error.response)
             case 403:
                 break
             case 404:
@@ -58,10 +65,8 @@ instance.interceptors.response.use(
 
 // 未登录处理
 const proceedNotLogined = () => {
-    message.warning('登录已过期，请重新登录！', 3);
-    setTimeout(history.push('/login'), 3);
-};
-
-
+    message.warning('登录已过期，请重新登录！', 3)
+    setTimeout(history.push('/login'), 3)
+}
 
 export default instance

@@ -17,38 +17,44 @@ class Login extends Component {
     }
 
     stopLoading = () => {
-        this.setState(
-            {
-                loading: false
-            }
-        )
+        this.setState({
+            loading: false
+        })
     }
 
     handleSubmit = e => {
-        let loginResult;
-        let errorMsg;
+        let loginResult
+        let errorMsg
         e.preventDefault()
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                let { username, password } = values
-                axios.post(`${HOST}/manage/login`, { username, password })
+                // let { username, password } = values
+                let formData = new FormData()
+                formData.append('username', values.username)
+                formData.append('password', values.password)
+                axios
+                    .post(`${HOST}/manage/login`, formData)
                     .then(res => {
-                        if (res.data.code === 200) {
+                        console.log('登录请求结果: ' + JSON.stringify(res))
+                        if (res.status === 200) {
                             console.log('登录成功')
-                            // localStorage.setItem('user', JSON.stringify(res.data.data.user))
-                            let token = res.data.data
+                            let authorization = res.headers.authorization
+                            let index = str.indexOf('bear ')
+
+                            console.log('登录:' + authorization)
+                            let token = authorization.substring(index + authorization.length)
                             localStorage.setItem('token', token)
                             this.props.history.push('/')
                             message.success('登录成功!')
-                            loginResult = true;
+                            loginResult = true
                         } else {
                             // 这里处理一些错误信息
                             console.log('登录失败 失败原因:' + JSON.stringify(res.data.message))
-                            loginResult = false;
-                            errorMsg = JSON.stringify(res.data.message);
+                            loginResult = false
+                            errorMsg = JSON.stringify(res.data.message)
                         }
                     })
-                    .catch(err => { })
+                    .catch(err => {})
 
                 // 这里可以做权限校验 模拟接口返回用户权限标识
                 switch (values.username) {
@@ -59,20 +65,20 @@ class Login extends Component {
                         values.auth = 1
                 }
 
-                localStorage.setItem('user', JSON.stringify(values));
-                this.enterLoading();
+                localStorage.setItem('user', JSON.stringify(values))
+                this.enterLoading()
                 this.timer = setTimeout(() => {
                     if (loginResult) {
                         message.success('登录成功!')
                         this.props.history.push('/')
                     } else {
-                        if(errorMsg !== undefined){
-                            let reg = new RegExp('"','g');
+                        if (errorMsg !== undefined) {
+                            let reg = new RegExp('"', 'g')
                             errorMsg = errorMsg.replace(reg, '')
-                            errorMsg += ',';
+                            errorMsg += ','
                         }
                         message.error(errorMsg + '请重试!')
-                        this.stopLoading();
+                        this.stopLoading()
                         this.props.history.push('/login')
                     }
                 }, 2000)
