@@ -36,14 +36,14 @@ class Login extends Component {
                     .post(`${HOST}/manage/login`, formData)
                     .then(res => {
                         console.log('登录请求结果: ' + JSON.stringify(res))
-                        if (res.status === 200) {
-                            console.log('登录成功')
+                        // if (res.status === 200) {
+                        if (res.data != undefined) {
                             let authorization = res.headers.authorization
-                            let index = str.indexOf('bear ')
-
-                            console.log('登录:' + authorization)
-                            let token = authorization.substring(index + authorization.length)
-                            localStorage.setItem('token', token)
+                            console.log('登录成功 authorization:' + authorization)
+                            // let index = authorization.indexOf('Bearer')
+                            // let token = authorization.substring(index + 'Bearer'.length).trim()
+                            // console.log('登录成功 截取后的token:'+ token)
+                            localStorage.setItem('authorization', authorization)
                             this.props.history.push('/')
                             message.success('登录成功!')
                             loginResult = true

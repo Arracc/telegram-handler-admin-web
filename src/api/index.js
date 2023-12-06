@@ -17,11 +17,11 @@ instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlenco
 instance.interceptors.request.use(
     config => {
         // // 从本地获取 Authorization
-        const token = localStorage.getItem('token')
-        console.log('axios请求前取出token:' + token)
+        const authorization = localStorage.getItem('authorization')
+        console.log('axios请求前取出authorization:' + authorization)
 
         // // 在请求头中添加 Authorization
-        token && (config.headers.Authorization = token)
+        authorization && (config.headers.Authorization = authorization)
         // if (authorization) {
         //     instance.defaults.headers.common['Authorization'] = authorization;
         //     config.headers.Authorization = token
