@@ -1105,7 +1105,7 @@ class InfoCardModal extends Component {
 
     queryById = id => {
         this.setState({ loading: true })
-        let url = HOST + '/teacher/queryById'
+        let url = HOST + '/teacher/info'
         let param = {
             id: id
         }
