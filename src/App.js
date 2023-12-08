@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import loadable from './utils/loadable'
 import 'animate.css'
@@ -13,16 +13,18 @@ const View404 = loadable(() => import(/* webpackChunkName: '404' */ './views/Oth
 const View500 = loadable(() => import(/* webpackChunkName: '500' */ './views/Others/500'))
 const Login = loadable(() => import(/* webpackChunkName: 'login' */ './views/Login'))
 
-const App = () => (
-    <Router>
-        <Switch>
-            <Route path='/' exact render={() => <Redirect to='/index' />} />
-            <Route path='/500' component={View500} />
-            <Route path='/login' component={Login} />
-            <Route path='/404' component={View404} />
-            <Route component={DefaultLayout} />
-        </Switch>
-    </Router>
-)
+const App = () => {
+    return (
+        <Router>
+            <Switch>
+                <Route path='/' exact render={() => <Redirect to='/index' />} />
+                <Route path='/500' component={View500} />
+                <Route path='/login' component={Login} />
+                <Route path='/404' component={View404} />
+                <Route component={DefaultLayout} />
+            </Switch>
+        </Router>
+    )
+}
 
 export default App

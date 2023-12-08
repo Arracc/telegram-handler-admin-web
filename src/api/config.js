@@ -2,8 +2,8 @@
 
 // host
 // 本地环境
-export const HOST = 'http://localhost:3000/api2/web'
+export const HOST = 'http://localhost:3000/api2'
 // 生产环境
-// export const HOST = 'https://telegram.345555.xyz/api/web'
+// export const HOST = 'https://telegram.345555.xyz/api'
 
 export const PYHOST = 'https://telegram.345555.xyz/pyapi'

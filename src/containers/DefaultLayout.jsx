@@ -23,7 +23,7 @@ class DefaultLayout extends Component {
     }
 
     isLogin = () => {
-        if (!localStorage.getItem('user')) {
+        if (!localStorage.getItem('authorization')) {
             this.props.history.push('/login')
         } else {
             this.setState({
@@ -39,12 +39,16 @@ class DefaultLayout extends Component {
     }
     getMenu = menu => {
         let newMenu,
-            auth = JSON.parse(localStorage.getItem('user')).auth
+            // auth = JSON.parse(localStorage.getItem('authorization')).auth
+            auth = localStorage.getItem('authorization')
         if (!auth) {
+            console.log('1')
             return menu
         } else {
-            newMenu = menu.filter(res => res.auth && res.auth.indexOf(auth) !== -1)
-            return newMenu
+            console.log('2')
+            // newMenu = menu.filter(res => res.auth && res.auth.indexOf(auth) !== -1)
+            // return newMenu
+            return menu
         }
     }
 
@@ -128,9 +132,4 @@ const dispatchToProp = dispatch => ({
     }
 })
 
-export default withRouter(
-    connect(
-        stateToProp,
-        dispatchToProp
-    )(DefaultLayout)
-)
+export default withRouter(connect(stateToProp, dispatchToProp)(DefaultLayout))

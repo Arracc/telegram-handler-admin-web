@@ -488,7 +488,7 @@ class TeacherTable extends Component {
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
-        let url = HOST + '/teacher/page'
+        let url = HOST + '/teacher/web/page'
         let param = {
             ...(pageIndex !== null ? { current: pageIndex } : {}),
             ...(pageSize !== null ? { size: pageSize } : {}),
@@ -839,7 +839,7 @@ class TeacherTable extends Component {
             id: id,
             isSubscribed: isSubscriebd
         }
-        let teacherSaveUrl = HOST + '/teacher/save'
+        let teacherSaveUrl = HOST + '/teacher/web/save'
         axios
             .post(teacherSaveUrl, param)
             .then(res => {
@@ -963,7 +963,7 @@ class InfoCardModal extends Component {
         console.log('handleOk')
         // 提交表单
         // 发送异步请求保存编辑后的数据
-        let teacherSaveUrl = HOST + '/teacher/save'
+        let teacherSaveUrl = HOST + '/teacher/web/save'
         console.log('save:' + JSON.stringify(this.state.data))
         let param = {
             id: this.state.data.id,
@@ -1105,7 +1105,7 @@ class InfoCardModal extends Component {
 
     queryById = id => {
         this.setState({ loading: true })
-        let url = HOST + '/teacher/info'
+        let url = HOST + '/teacher/web/info'
         let param = {
             id: id
         }
