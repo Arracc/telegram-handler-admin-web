@@ -108,7 +108,7 @@ class Root extends Component {
             heightLe: null,
             status: null,
             lastSeen: null,
-            orderBy: null,
+            sortType: null,
             tag: null
         }
     }
@@ -147,10 +147,11 @@ class Root extends Component {
         )
     }
 
-    changeStateOrderBy = value => {
-        this.setState({
-            orderBy: value
-        })
+    changeStateSortBy = value => {
+        console.log('root sort:' + value)
+        const { search } = this.state
+        search['sortType'] = value
+        this.setState({ search })
     }
 
     render() {
@@ -377,7 +378,7 @@ class Root extends Component {
                                     ref={node => (this.TeacherTable = node)}
                                     showInfoCard={data => this.showInfoCard(data)}
                                     refreshTable={() => this.refreshTable()}
-                                    changeStateOrderBy={value => this.changeStateOrderBy(value)}
+                                    changeStateSortBy={value => this.changeStateSortBy(value)}
                                 />
                             </div>
                         </div>
@@ -461,8 +462,9 @@ class TeacherTable extends Component {
                 } else {
                     sortParam = null // 不排序
                 }
-                this.props.changeStateOrderBy(sortParam)
             }
+            console.log('sort:' + sortParam)
+            this.props.changeStateSortBy(sortParam)
         }
 
         // 更新state中的pagination
