@@ -1042,42 +1042,43 @@ class InfoCardModal extends Component {
             tag: this.state.data.tag || '',
             remark: this.state.data.remark || ''
         }
-        if (this.state.data.priceP) {
+        if (this.state.data.priceP !== undefined && this.state.data.priceP !== null) {
             param.priceP = this.state.data.priceP
         }
 
-        if (this.state.data.pricePp) {
+        if (this.state.data.pricePp !== undefined && this.state.data.pricePp !== null) {
             param.pricePp = this.state.data.pricePp
         }
 
-        if (this.state.data.age) {
+        if (this.state.data.age !== undefined && this.state.data.age !== null) {
             param.age = this.state.data.age
         }
-        if (this.state.data.userId) {
+
+        if (this.state.data.userId !== undefined && this.state.data.userId !== null) {
             param.userId = this.state.data.userId
         }
 
-        if (this.state.data.height) {
+        if (this.state.data.height !== undefined && this.state.data.height !== null) {
             param.height = this.state.data.height
         }
 
-        if (this.state.data.weight) {
+        if (this.state.data.weight !== undefined && this.state.data.weight !== null) {
             param.weight = this.state.data.weight
         }
 
-        if (this.state.data.kissType) {
+        if (this.state.data.kissType !== undefined && this.state.data.kissType !== null) {
             param.kissType = this.state.data.kissType
         }
 
-        if (this.state.data.isSn) {
+        if (this.state.data.isSn !== undefined && this.state.data.isSn !== null) {
             param.isSn = this.state.data.isSn
         }
 
-        if (this.state.data.isJk) {
+        if (this.state.data.isJk !== undefined && this.state.data.isJk !== null) {
             param.isJk = this.state.data.isJk
         }
 
-        if (this.state.data.isLolita) {
+        if (this.state.data.isLolita !== undefined && this.state.data.isLolita !== null) {
             param.isLolita = this.state.data.isLolita
         }
 
