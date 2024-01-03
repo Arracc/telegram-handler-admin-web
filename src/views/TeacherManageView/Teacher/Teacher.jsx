@@ -73,10 +73,18 @@ const commonShowOption2 = [
     { label: '√', value: 1 }
 ]
 
-const statusOption = [
+const teacherStatusOption = [
     { label: '\u00A0', value: null },
     { label: '正常', value: 1 },
-    { label: '上岸', value: 2 },
+    { label: '暂离', value: 2 },
+    { label: '上岸', value: 3 },
+    { label: '失联', value: 4 }
+]
+
+const accountStatusOption = [
+    { label: '\u00A0', value: null },
+    { label: '正常', value: 1 },
+    { label: '转移', value: 2 },
     { label: '失效', value: 3 }
 ]
 
@@ -106,7 +114,8 @@ class Root extends Component {
             ageLe: null,
             heightGe: null,
             heightLe: null,
-            status: null,
+            teacherStatus: null,
+            accountStatus: null,
             lastSeen: null,
             sortType: null,
             tag: null
@@ -311,6 +320,19 @@ class Root extends Component {
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    自聊：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isIndividual', value)}>
+                                        {ifNotOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     订阅：
                                     <Select
                                         style={{ width: '50px' }}
@@ -324,16 +346,34 @@ class Root extends Component {
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    状态：
+                                    老师状态：
                                     <Select
                                         style={{ width: '160px' }}
                                         mode='multiple' // 设置为多选模式
-                                        onChange={values => this.handleChange('status', values)} // 注意这里的values是一个数组
+                                        onChange={values => this.handleChange('teacherStatus', values)} // 注意这里的values是一个数组
                                     >
                                         <Select.Option key='empty' value=''>
                                             {/* 空白选项 */}
                                         </Select.Option>
-                                        {statusOption.map(option => (
+                                        {teacherStatusOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    账号状态：
+                                    <Select
+                                        style={{ width: '160px' }}
+                                        mode='multiple' // 设置为多选模式
+                                        onChange={values => this.handleChange('accountStatus', values)} // 注意这里的values是一个数组
+                                    >
+                                        <Select.Option key='empty' value=''>
+                                            {/* 空白选项 */}
+                                        </Select.Option>
+                                        {accountStatusOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
                                             </Select.Option>
@@ -715,6 +755,17 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '自聊',
+            dataIndex: 'isIndividual',
+            key: 'isIndividual',
+            render: val => {
+                const selectedOption = commonShowOption2.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '订阅',
             dataIndex: 'isSubscribed',
             key: 'isSubscribed',
@@ -756,11 +807,22 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
-            title: '状态',
-            dataIndex: 'status',
-            key: 'status',
+            title: '老师状态',
+            dataIndex: 'teacherStatus',
+            key: 'teacherStatus',
             render: val => {
-                const selectedOption = statusOption.find(option => option.value === val)
+                const selectedOption = teacherStatusOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '账号状态',
+            dataIndex: 'accountStatus',
+            key: 'accountStatus',
+            render: val => {
+                const selectedOption = accountStatusOption.find(option => option.value === val)
                 return selectedOption ? selectedOption.label : ''
             },
             align: 'center',
@@ -976,6 +1038,8 @@ class InfoCardModal extends Component {
             channelUsername: this.state.data.channelUsername || '',
             priceComplete: this.state.data.priceComplete || '',
             region: this.state.data.region || '',
+            isIndividual: this.state.data.isIndividual || 0,
+            isMultiCity: this.state.data.isMultiCity || 0,
             isSubscribed: this.state.data.isSubscribed || 0,
             tag: this.state.data.tag || '',
             remark: this.state.data.remark || ''
@@ -1020,15 +1084,25 @@ class InfoCardModal extends Component {
             param.isLolita = this.state.data.isLolita
         }
 
-        if (this.state.data.isSubscribed !== undefined) {
+        if (this.state.data.isIndividual != undefined) {
+            param.isIndividual = this.state.data.isIndividual
+        }
+
+        if (this.state.data.isMultiCity != undefined) {
+            param.isMultiCity = this.state.data.isMultiCity
+        }
+
+        if (this.state.data.isSubscribed != undefined) {
             param.isSubscribed = this.state.data.isSubscribed
         }
 
-        if (this.state.data.status !== undefined) {
-            param.status = this.state.data.status
+        if (this.state.data.teacherStatus != undefined) {
+            param.teacherStatus = this.state.data.teacherStatus
         }
 
-        console.log('save param:' + JSON.stringify(param))
+        if (this.state.data.accountStatus != undefined) {
+            param.accountStatus = this.state.data.accountStatus
+        }
 
         // 修改资料
         axios
@@ -1271,6 +1345,28 @@ class InfoCardModal extends Component {
                                 ))}
                             </Radio.Group>
                         </Form.Item>
+                        <Form.Item label='是否自聊' name='isIndividual' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isIndividual}
+                                onChange={e => this.handleChange('isIndividual', e.target.value)}>
+                                {ifNotOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
+                        <Form.Item label='是否多地' name='isMultiCity' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isMultiCity}
+                                onChange={e => this.handleChange('isMultiCity', e.target.value)}>
+                                {ifNotOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
                         <Form.Item label='是否订阅' name='isSubscribed' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isSubscribed}
@@ -1308,11 +1404,23 @@ class InfoCardModal extends Component {
                             />
                         </Form.Item>
 
-                        <Form.Item label='状态' name='status' className='form-item'>
+                        <Form.Item label='老师状态' name='teacherStatus' className='form-item'>
                             <Radio.Group
-                                value={this.state.data.status}
-                                onChange={e => this.handleChange('status', e.target.value)}>
-                                {statusOption.map(option => (
+                                value={this.state.data.teacherStatus}
+                                onChange={e => this.handleChange('teacherStatus', e.target.value)}>
+                                {teacherStatusOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
+
+                        <Form.Item label='状态' name='accountStatus' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.accountStatus}
+                                onChange={e => this.handleChange('accountStatus', e.target.value)}>
+                                {accountStatusOption.map(option => (
                                     <Radio key={option.value} value={option.value}>
                                         {option.label}
                                     </Radio>
