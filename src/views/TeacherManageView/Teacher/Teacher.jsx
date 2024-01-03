@@ -44,7 +44,7 @@ const regionOptions = [
 
 const kissTypeOption = [
     { label: '\u00A0', value: null },
-    { label: '无', value: 0 },
+    { label: '×', value: 0 },
     { label: 'kiss', value: 1 },
     { label: '舌吻', value: 2 }
 ]
@@ -920,6 +920,8 @@ class InfoCardModal extends Component {
             }
         }))
 
+        console.log('state' + JSON.stringify(this.state.data))
+
         // 昵称
         if (field === 'nickname') {
             if (value.trim() === '') {
@@ -1025,6 +1027,8 @@ class InfoCardModal extends Component {
         if (this.state.data.status !== undefined) {
             param.status = this.state.data.status
         }
+
+        console.log('save param:' + JSON.stringify(param))
 
         // 修改资料
         axios
