@@ -3,7 +3,10 @@ import loadable from '@/utils/loadable'
 const Index = loadable(() => import(/* webpackChunkName: 'index' */ '@/views/Index'))
 
 // 用户管理
-const TeacherView = loadable(() => import(/* webpackChunkName: 'TeacherView' */ '@/views/TeacherManageView/Teacher'))
+const TeacherView = loadable(() => import(/* webpackChunkName: 'TeacherView' */ '@/views/TeacherManage/Teacher'))
+const ChannelEvolutionView = loadable(() =>
+    import(/* webpackChunkName: 'CandidateView' */ '@/views/TeacherManage/ChannelEvolution')
+)
 const CandidateView = loadable(() =>
     import(/* webpackChunkName: 'CandidateView' */ '@/views/CandidateManageView/Candidate')
 )
@@ -43,6 +46,13 @@ const About = loadable(() => import(/* webpackChunkName: 'about' */ '@/views/Abo
 const routes = [
     { path: '/index', exact: true, name: 'Index', component: Index, auth: [1] },
     { path: '/teacher-manage/teacher', exact: false, name: '用户列表', component: TeacherView, auth: [1] },
+    {
+        path: '/teacher-manage/channel-evolution',
+        exact: false,
+        name: '频道访问量',
+        component: ChannelEvolutionView,
+        auth: [1]
+    },
     { path: '/candidate-manage/candidate', exact: false, name: '候选列表', component: CandidateView, auth: [1] },
     // { path: '/teacher-manage/group', exact: false, name: '群', component: GroupView, auth: [1] },
     // { path: '/message-record/undelivered-message', exact: false, name: '未送达消息', component: UndeliveredMessageView, auth: [1] },

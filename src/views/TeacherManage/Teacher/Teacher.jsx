@@ -776,22 +776,22 @@ class TeacherTable extends Component {
             align: 'center',
             resizable: true // 允许调节列宽
         },
-        {
-            title: '首日访问量',
-            dataIndex: 'channel1dViews',
-            key: 'channel1dViews',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
-        {
-            title: '订阅数',
-            dataIndex: 'channelMembers',
-            key: 'channelMembers',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
+        // {
+        //     title: '首日访问量',
+        //     dataIndex: 'channel1dViews',
+        //     key: 'channel1dViews',
+        //     align: 'center',
+        //     resizable: true,
+        //     sorter: true
+        // },
+        // {
+        //     title: '订阅数',
+        //     dataIndex: 'channelMembers',
+        //     key: 'channelMembers',
+        //     align: 'center',
+        //     resizable: true,
+        //     sorter: true
+        // },
         {
             title: '标签',
             dataIndex: 'tag',
@@ -799,13 +799,13 @@ class TeacherTable extends Component {
             align: 'center',
             resizable: true // 允许调节列宽
         },
-        {
-            title: '备注',
-            dataIndex: 'remark',
-            key: 'remark',
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
+        // {
+        //     title: '备注',
+        //     dataIndex: 'remark',
+        //     key: 'remark',
+        //     align: 'center',
+        //     resizable: true // 允许调节列宽
+        // },
         {
             title: '老师状态',
             dataIndex: 'teacherStatus',

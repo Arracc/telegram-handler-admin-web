@@ -10,7 +10,8 @@ const menu = [
         key: '/user-manage',
         icon: 'pie-chart',
         subs: [
-            { title: '用户列表', key: '/teacher-manage/teacher', icon: '' }
+            { title: '用户列表', key: '/teacher-manage/teacher', icon: '' },
+            { title: '频道访问量列表', key: '/teacher-manage/channel-evolution', icon: '' }
             // { title: '群', key: '/session-manage/group', icon: '' },
         ]
     },
