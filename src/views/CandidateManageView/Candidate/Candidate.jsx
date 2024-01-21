@@ -199,7 +199,7 @@ class TeacherTable extends Component {
     // 异步获取数据
     queryPage = (pageIndex, pageSize, filters) => {
         this.setState({ loading: true })
-        let url = HOST + '/candidate/page'
+        let url = HOST + '/candidate/web/page'
         let param = {
             ...(pageIndex !== null ? { current: pageIndex } : {}),
             ...(pageSize !== null ? { size: pageSize } : {}),

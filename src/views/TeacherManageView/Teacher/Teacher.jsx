@@ -777,7 +777,7 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
-            title: '首日访问量',
+            title: '访问量',
             dataIndex: 'channel1dViews',
             key: 'channel1dViews',
             align: 'center',
@@ -788,6 +788,14 @@ class TeacherTable extends Component {
             title: '订阅数',
             dataIndex: 'channelMembers',
             key: 'channelMembers',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '更新时间',
+            dataIndex: 'channelUpdatedTime',
+            key: 'channelUpdatedTime',
             align: 'center',
             resizable: true,
             sorter: true
