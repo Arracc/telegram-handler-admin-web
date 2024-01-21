@@ -10,6 +10,26 @@
     text-align: center;
 }
 
+/* 表头单元格 */
+.ant-table th {
+    position: relative;
+}
+
+/* 拖动调整列宽的边界线 */
+.ant-table th .ant-table-column-resize {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 4px; /* 调整这个值以调整边界线的宽度 */
+    cursor: col-resize;
+}
+
+/* 表格的行 */
+.ant-table-tbody > tr > td {
+    padding: 5px 2px; /* 调整行内边距，这里的值可以根据需要进行调整 */
+}
+
 .subscribeButton {
     width: 100px;
     height: 30px;

@@ -44,7 +44,7 @@ const regionOptions = [
 
 const kissTypeOption = [
     { label: '\u00A0', value: null },
-    { label: '无', value: 0 },
+    { label: '×', value: 0 },
     { label: 'kiss', value: 1 },
     { label: '舌吻', value: 2 }
 ]
@@ -318,7 +318,7 @@ class Root extends Component {
                                         ))}
                                     </Select>
                                 </span>
-                                
+
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     自聊：
                                     <Select
@@ -807,13 +807,13 @@ class TeacherTable extends Component {
             align: 'center',
             resizable: true // 允许调节列宽
         },
-        {
-            title: '备注',
-            dataIndex: 'remark',
-            key: 'remark',
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
+        // {
+        //     title: '备注',
+        //     dataIndex: 'remark',
+        //     key: 'remark',
+        //     align: 'center',
+        //     resizable: true // 允许调节列宽
+        // },
         {
             title: '老师状态',
             dataIndex: 'teacherStatus',
@@ -990,6 +990,8 @@ class InfoCardModal extends Component {
             }
         }))
 
+        console.log('state' + JSON.stringify(this.state.data))
+
         // 昵称
         if (field === 'nickname') {
             if (value.trim() === '') {
@@ -1109,7 +1111,6 @@ class InfoCardModal extends Component {
         if (this.state.data.accountStatus != undefined) {
             param.accountStatus = this.state.data.accountStatus
         }
-
 
         // 修改资料
         axios

@@ -18,7 +18,7 @@ instance.interceptors.request.use(
     config => {
         // // 从本地获取 Authorization
         const authorization = localStorage.getItem('authorization')
-        console.log('axios请求前取出authorization:' + authorization)
+        // console.log('axios请求前取出authorization:' + authorization)
 
         // // 在请求头中添加 Authorization
         authorization && (config.headers.Authorization = authorization)
