@@ -85,7 +85,8 @@ const accountStatusOption = [
     { label: '\u00A0', value: null },
     { label: '正常', value: 1 },
     { label: '转移', value: 2 },
-    { label: '失效', value: 3 }
+    { label: '失效', value: 3 },
+    { label: '换人', value: 4 }
 ]
 
 const lastSeenOption = [
@@ -502,6 +503,14 @@ class TeacherTable extends Component {
                 } else {
                     sortParam = null // 不排序
                 }
+            } else if (sorter.columnKey == 'channelUpdatedTime') {
+                if (sorter.order === 'ascend') {
+                    sortParam = 11 // 升序
+                } else if (sorter.order === 'descend') {
+                    sortParam = 12 // 降序
+                } else {
+                    sortParam = null // 不排序
+                }
             }
             console.log('sort:' + sortParam)
             this.props.changeStateSortBy(sortParam)
@@ -776,22 +785,31 @@ class TeacherTable extends Component {
             align: 'center',
             resizable: true // 允许调节列宽
         },
-        // {
-        //     title: '首日访问量',
-        //     dataIndex: 'channel1dViews',
-        //     key: 'channel1dViews',
-        //     align: 'center',
-        //     resizable: true,
-        //     sorter: true
-        // },
-        // {
-        //     title: '订阅数',
-        //     dataIndex: 'channelMembers',
-        //     key: 'channelMembers',
-        //     align: 'center',
-        //     resizable: true,
-        //     sorter: true
-        // },
+        {
+            title: '访问量',
+            dataIndex: 'channel1dViews',
+            key: 'channel1dViews',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '订阅数',
+            dataIndex: 'channelMembers',
+            key: 'channelMembers',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '更新时间',
+            dataIndex: 'channelUpdatedTime',
+            key: 'channelUpdatedTime',
+            align: 'center',
+            resizable: true,
+            sorter: true,
+            render: text => this.formatDate(text) // 调用格式化方法
+        },
         {
             title: '标签',
             dataIndex: 'tag',
@@ -867,6 +885,20 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         }
     ]
+
+    // 格式化日期时间
+    formatDate = dateTimeString => {
+        if (!dateTimeString) return '' // 处理空日期情况
+        const dateTime = new Date(dateTimeString)
+        const year = dateTime.getFullYear()
+        const month = String(dateTime.getMonth() + 1).padStart(2, '0')
+        const day = String(dateTime.getDate()).padStart(2, '0')
+        const hours = String(dateTime.getHours()).padStart(2, '0')
+        const minutes = String(dateTime.getMinutes()).padStart(2, '0')
+        const seconds = String(dateTime.getSeconds()).padStart(2, '0')
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    }
 
     // 弹出用户连接列表窗口
     edit = record => {
