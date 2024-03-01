@@ -115,6 +115,9 @@ class Root extends Component {
             ageLe: null,
             heightGe: null,
             heightLe: null,
+            weightGe: null,
+            weightLe: null,
+            cup: null,
             teacherStatus: null,
             accountStatus: null,
             lastSeen: null,
@@ -247,6 +250,14 @@ class Root extends Component {
                                     <Input
                                         style={{ width: '50px' }}
                                         onChange={e => this.handleChange('weightLe', e.target.value)}
+                                    />
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    cup：
+                                    <Input
+                                        style={{ width: '50px' }}
+                                        onChange={e => this.handleChange('cup：', e.target.value)}
                                     />
                                 </span>
 
@@ -720,6 +731,14 @@ class TeacherTable extends Component {
             sorter: true
         },
         {
+            title: 'cup',
+            dataIndex: 'cup',
+            key: 'cup',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
             title: 'kiss',
             dataIndex: 'kissType',
             key: 'kissType',
@@ -1100,6 +1119,10 @@ class InfoCardModal extends Component {
             param.weight = this.state.data.weight
         }
 
+        if (this.state.data.cup !== undefined && this.state.data.cup !== null) {
+            param.cup = this.state.data.cup
+        }
+
         if (this.state.data.kissType !== undefined && this.state.data.kissType !== null) {
             param.kissType = this.state.data.kissType
         }
@@ -1331,6 +1354,12 @@ class InfoCardModal extends Component {
                             <Input
                                 value={this.state.data.weight}
                                 onChange={e => this.handleChange('weight', e.target.value)}
+                            />
+                        </Form.Item>
+                        <Form.Item label='cup' name='cup' className='form-item'>
+                            <Input
+                                value={this.state.data.cup}
+                                onChange={e => this.handleChange('cup', e.target.value)}
                             />
                         </Form.Item>
                         <Form.Item label='有无kiss' name='kissType' className='form-item'>
