@@ -642,7 +642,7 @@ class ChannelEvolutionTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
-            title: 'p',
+            title: '价格',
             dataIndex: 'priceP',
             key: 'priceP',
             align: 'center',
@@ -650,7 +650,7 @@ class ChannelEvolutionTable extends Component {
             sorter: true
         },
         {
-            title: '首日访问量',
+            title: '访问量',
             dataIndex: 'channel1dViews',
             key: 'channel1dViews',
             align: 'center',
