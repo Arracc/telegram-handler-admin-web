@@ -46,7 +46,7 @@ const kissTypeOption = [
     { label: '\u00A0', value: null },
     { label: '×', value: 0 },
     { label: 'kiss', value: 1 },
-    { label: '舌吻', value: 2 }
+    { label: '🐍', value: 2 }
 ]
 
 const haveNotOption = [
@@ -70,7 +70,7 @@ const commonShowOption = [
 const commonShowOption2 = [
     { label: '\u00A0', value: null },
     { label: '\u00A0', value: 0 },
-    { label: '√', value: 1 }
+    { label: '是', value: 1 }
 ]
 
 const teacherStatusOption = [
@@ -299,35 +299,6 @@ class ChannelEvolutionTable extends Component {
         )
     }
 
-    // 异步获取数据
-    // queryPage = (pageIndex, pageSize, filters) => {
-    //     this.setState({ loading: true })
-    //     let url = HOST + '/teacher/web/page'
-    //     let param = {
-    //         ...(pageIndex !== null ? { current: pageIndex } : {}),
-    //         ...(pageSize !== null ? { size: pageSize } : {}),
-    //         ...(filters !== null ? filters : {})
-    //     }
-    //     axios
-    //         .post(url, param)
-    //         .then(res => {
-    //             if (res.data.code === 200) {
-    //                 const pagination = { ...this.state.pagination }
-    //                 pagination.total = res.data.data.total
-    //                 pagination.current = res.data.data.current
-    //                 pagination.size = res.data.data.size
-    //                 this.setState({
-    //                     loading: false,
-    //                     data: res.data.data.records,
-    //                     pagination
-    //                 })
-    //             } else {
-    //                 // 这里处理一些错误信息
-    //                 console.log('请求错误')
-    //             }
-    //         })
-    //         .catch(err => {})
-    // }
     queryPage = filters => {
         const { type } = filters || { type: 0 }; // Using destructuring assignment with default value
         this.setState({ loading: true });
@@ -414,6 +385,13 @@ class ChannelEvolutionTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '地区',
+            dataIndex: 'region',
+            key: 'region',
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '名字',
             dataIndex: 'nickname',
             key: 'nickname',
@@ -422,11 +400,56 @@ class ChannelEvolutionTable extends Component {
         },
         {
             title: '价格',
-            dataIndex: 'priceP',
-            key: 'priceP',
+            dataIndex: 'priceStr',
+            key: 'priceStr',
             align: 'center',
             resizable: true, // 允许调节列宽
             sorter: true
+        },
+        {
+            title: '年龄',
+            dataIndex: 'age',
+            key: 'age',
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '身高',
+            dataIndex: 'height',
+            key: 'height',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '体重',
+            dataIndex: 'weight',
+            key: 'weight',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: 'kiss',
+            dataIndex: 'kissType',
+            key: 'kissType',
+            render: val => {
+                const selectedOption = kissTypeOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '69',
+            dataIndex: 'isSn',
+            key: 'isSn',
+            render: val => {
+                const selectedOption = commonShowOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
         },
         {
             title: '访问量',
@@ -445,12 +468,59 @@ class ChannelEvolutionTable extends Component {
             sorter: true
         },
         {
+            title: '排名变化',
+            dataIndex: 'rankChanged',
+            key: 'rankChanged',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '排名变化',
+            dataIndex: 'rankChangedStr',
+            key: 'rankChangedStr',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '变化方向',
+            dataIndex: 'rankMovement',
+            key: 'rankMovement',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '开课时间',
+            dataIndex: 'firstMessageTime',
+            key: 'firstMessageTime',
+            align: 'center',
+            resizable: true,
+            sorter: true,
+            render: text => {
+                const date = new Date(text);
+                const formattedTime = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`; // 加1是因为getMonth()返回的月份是从0开始计数的
+                return <span>{formattedTime}</span>;
+            }
+        },
+        {
+            title: '自聊',
+            dataIndex: 'isIndividual',
+            key: 'isIndividual',
+            render: val => {
+                const selectedOption = commonShowOption2.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '更新时间',
             dataIndex: 'monitorCompletedTime',
             key: 'monitorCompletedTime',
             align: 'center',
             resizable: true,
-
             sorter: true,
             render: text => {
                 const formattedTime = new Date(text).toLocaleString() // 使用toLocaleString()进行格式化
@@ -503,65 +573,7 @@ class ChannelEvolutionTable extends Component {
                 </Tooltip>
             )
         },
-        {
-            title: 'pp',
-            dataIndex: 'pricePp',
-            key: 'pricePp',
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
-        {
-            title: '地区',
-            dataIndex: 'region',
-            key: 'region',
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
-        {
-            title: '年龄',
-            dataIndex: 'age',
-            key: 'age',
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
-        {
-            title: '身高',
-            dataIndex: 'height',
-            key: 'height',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
-        {
-            title: '体重',
-            dataIndex: 'weight',
-            key: 'weight',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
-        {
-            title: 'kiss',
-            dataIndex: 'kissType',
-            key: 'kissType',
-            render: val => {
-                const selectedOption = kissTypeOption.find(option => option.value === val)
-                return selectedOption ? selectedOption.label : ''
-            },
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
-        {
-            title: '69',
-            dataIndex: 'isSn',
-            key: 'isSn',
-            render: val => {
-                const selectedOption = commonShowOption.find(option => option.value === val)
-                return selectedOption ? selectedOption.label : ''
-            },
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
+
         {
             title: 'JK',
             dataIndex: 'isJk',
@@ -584,17 +596,7 @@ class ChannelEvolutionTable extends Component {
             align: 'center',
             resizable: true // 允许调节列宽
         },
-        {
-            title: '自聊',
-            dataIndex: 'isIndividual',
-            key: 'isIndividual',
-            render: val => {
-                const selectedOption = commonShowOption2.find(option => option.value === val)
-                return selectedOption ? selectedOption.label : ''
-            },
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
+
         // {
         //     title: '订阅',
         //     dataIndex: 'isSubscribed',
@@ -653,600 +655,9 @@ class ChannelEvolutionTable extends Component {
         //     align: 'center',
         //     resizable: true // 允许调节列宽
         // },
-        // {
-        //     title: '操作',
-        //     render: (text, record, index) => {
-        //         return (
-        //             <div>
-        //                 <span>
-        //                     <Button type='button' onClick={() => this.edit(record)}>
-        //                         编辑
-        //                     </Button>
-        //                 </span>
-        //                 <span style={{ marginLeft: '10px' }}></span> {/* 这里设置了10px的左边距作为按钮间隔 */}
-        //                 <span>
-        //                     <Button
-        //                         className='subscribeButton'
-        //                         type='button'
-        //                         onClick={() =>
-        //                             this.subscribe(record.id, record.isSubscribed === 0 ? 1 : 0, record.channelUsername)
-        //                         }>
-        //                         {record.isSubscribed === 0 ? '订阅' : '取消订阅'}
-        //                     </Button>
-        //                 </span>
-        //             </div>
-        //         )
-        //     },
-        //     align: 'center',
-        //     resizable: true // 允许调节列宽
-        // }
     ]
 
-    // 弹出用户连接列表窗口
-    // edit = record => {
-    //     this.props.showInfoCard(record.id)
-    // }
-
-    // 订阅
-    // subscribe = (id, type, username) => {
-    //     username = username.replace('https://t.me/', '')
-    //     username = username.replace('@', '')
-    //     let param = {
-    //         type: type,
-    //         username: username
-    //     }
-    //     // 提交
-    //     axios
-    //         .post(PYHOST + '/subscribeChannel', param)
-    //         .then(res => {
-    //             if (res.data.code === 200 && res.data.data) {
-    //                 notification.success({ message: '修改订阅成功' })
-    //                 // 修改成功后，修改资料
-    //                 this.updateInfo(id, type)
-    //             } else {
-    //                 notification.success({ message: '修改订阅失败' })
-    //             }
-    //         })
-    //         .catch(err => {
-    //             notification.success({ message: '修改订阅失败' })
-    //         })
-    // }
-
-    // updateInfo = (id, isSubscriebd) => {
-    //     let param = {
-    //         id: id,
-    //         isSubscribed: isSubscriebd
-    //     }
-    //     let teacherSaveUrl = HOST + '/teacher/web/save'
-    //     axios
-    //         .post(teacherSaveUrl, param)
-    //         .then(res => {
-    //             if (res.data.code === 200 && res.data.data) {
-    //                 notification.success({ message: '保存成功' })
-    //                 // 重新查询当前页
-    //                 this.props.refreshTable()
-    //             } else {
-    //                 notification.success({ message: '保存失败' })
-    //             }
-    //         })
-    //         .catch(err => {
-    //             notification.success({ message: '保存失败' })
-    //         })
-    // }
 }
-
-// class InfoCardModal extends Component {
-//     state = {
-//         loading: false,
-//         visible: false,
-//         id: 0,
-//         data: {},
-//         // tagOptions: [
-//         //     { label: 'kiss', value: '#kiss' },
-//         //     { label: '舌吻', value: '#舌吻' },
-//         //     { label: '69', value: '#69' },
-//         //     { label: '大车', value: '#大车' },
-//         //     { label: 'JK', value: '#JK' },
-//         //     { label: 'Lolita', value: '#Lolita' }
-//         // ],
-//         candidateList: [],
-//         showCandidateList: false,
-//         userId: null,
-//         originalIsSubscribed: null
-//     }
-
-//     constructor(props) {
-//         super(props)
-//         this.formRef = React.createRef()
-//     }
-//     showModal = id => {
-//         if (id == 0) {
-//             // 新增
-//             this.setState({
-//                 visible: true,
-//                 id: id,
-//                 originalIsSubscribed: null,
-//                 data: {}
-//             })
-//         } else if (id !== this.state.id) {
-//             // 查看详情 调用InfoCard的queryById方法
-//             console.log('showModal id不一致，将重新查询id:' + id)
-//             this.setState({
-//                 loading: true,
-//                 visible: true,
-//                 id: id,
-//                 originalIsSubscribed: null
-//             })
-//             this.queryById(id)
-//         } else {
-//             // 查看详情
-//             this.setState({
-//                 visible: true
-//             })
-//         }
-//     }
-
-//     handleChange = async (field, value) => {
-//         console.log(field + ': ' + value)
-
-//         this.setState(prevState => ({
-//             data: {
-//                 ...prevState.data,
-//                 [field]: value
-//             }
-//         }))
-
-//         console.log('state' + JSON.stringify(this.state.data))
-
-//         // 昵称
-//         if (field === 'nickname') {
-//             if (value.trim() === '') {
-//                 this.setState({
-//                     showCandidateList: false,
-//                     candidateList: []
-//                 })
-//             } else {
-//                 try {
-//                     const response = await axios.get(HOST + '/candidate/queryByName', {
-//                         params: {
-//                             name: value
-//                         }
-//                     })
-
-//                     const candidateList = response.data.data // 假设服务器返回一个候选人名称的数组
-
-//                     this.setState({
-//                         candidateList,
-//                         showCandidateList: candidateList.length > 0 // 如果 candidateList 不为空，则设置 showCandidateList 为 true，否则为 false
-//                     })
-//                 } catch (error) {
-//                     // 处理请求错误
-//                 }
-//             }
-//         }
-//     }
-
-//     handleNicknameSelection = candidate => {
-//         this.setState(prevState => ({
-//             data: {
-//                 ...prevState.data,
-//                 nickname: candidate.nickname,
-//                 username: candidate.username,
-//                 channelUsername: candidate.bio,
-//                 userId: candidate.userId,
-//                 region: candidate.region
-//             }
-//         }))
-//     }
-
-//     handleOk = () => {
-//         console.log('handleOk')
-//         // 提交表单
-//         // 发送异步请求保存编辑后的数据
-//         let teacherSaveUrl = HOST + '/teacher/web/save'
-//         console.log('save:' + JSON.stringify(this.state.data))
-//         let param = {
-//             id: this.state.data.id,
-//             nickname: this.state.data.nickname || '',
-//             username: this.state.data.username || '',
-//             channelUsername: this.state.data.channelUsername || '',
-//             priceComplete: this.state.data.priceComplete || '',
-//             region: this.state.data.region || '',
-//             isIndividual: this.state.data.isIndividual || 0,
-//             isMultiCity: this.state.data.isMultiCity || 0,
-//             isSubscribed: this.state.data.isSubscribed || 0,
-//             tag: this.state.data.tag || '',
-//             remark: this.state.data.remark || ''
-//         }
-//         if (this.state.data.priceP !== undefined && this.state.data.priceP !== null) {
-//             param.priceP = this.state.data.priceP
-//         }
-
-//         if (this.state.data.pricePp !== undefined && this.state.data.pricePp !== null) {
-//             param.pricePp = this.state.data.pricePp
-//         }
-
-//         if (this.state.data.age !== undefined && this.state.data.age !== null) {
-//             param.age = this.state.data.age
-//         }
-
-//         if (this.state.data.userId !== undefined && this.state.data.userId !== null) {
-//             param.userId = this.state.data.userId
-//         }
-
-//         if (this.state.data.height !== undefined && this.state.data.height !== null) {
-//             param.height = this.state.data.height
-//         }
-
-//         if (this.state.data.weight !== undefined && this.state.data.weight !== null) {
-//             param.weight = this.state.data.weight
-//         }
-
-//         if (this.state.data.kissType !== undefined && this.state.data.kissType !== null) {
-//             param.kissType = this.state.data.kissType
-//         }
-
-//         if (this.state.data.isSn !== undefined && this.state.data.isSn !== null) {
-//             param.isSn = this.state.data.isSn
-//         }
-
-//         if (this.state.data.isJk !== undefined && this.state.data.isJk !== null) {
-//             param.isJk = this.state.data.isJk
-//         }
-
-//         if (this.state.data.isLolita !== undefined && this.state.data.isLolita !== null) {
-//             param.isLolita = this.state.data.isLolita
-//         }
-
-//         if (this.state.data.isIndividual != undefined) {
-//             param.isIndividual = this.state.data.isIndividual
-//         }
-
-//         if (this.state.data.isMultiCity != undefined) {
-//             param.isMultiCity = this.state.data.isMultiCity
-//         }
-
-//         if (this.state.data.isSubscribed != undefined) {
-//             param.isSubscribed = this.state.data.isSubscribed
-//         }
-
-//         if (this.state.data.teacherStatus != undefined) {
-//             param.teacherStatus = this.state.data.teacherStatus
-//         }
-
-//         if (this.state.data.accountStatus != undefined) {
-//             param.accountStatus = this.state.data.accountStatus
-//         }
-
-//         // 修改资料
-//         axios
-//             .post(teacherSaveUrl, param)
-//             .then(res => {
-//                 if (res.data.code === 200 && res.data.data) {
-//                     notification.success({ message: '保存成功' })
-//                     // 关闭窗口
-//                     this.setState({
-//                         visible: false
-//                     })
-//                     // 重新查询当前页
-//                     this.props.refreshTable()
-//                 } else {
-//                     notification.success({ message: '保存失败' })
-//                 }
-//             })
-//             .catch(err => {
-//                 notification.success({ message: '保存失败' })
-//             })
-
-//         // 触发订阅/取消订阅
-//         console.log(
-//             '提交修改 isSubscribed 原始值' + this.state.originalIsSubscribed + ', 提交值：' + param.isSubscribed
-//         )
-//         if (
-//             (this.state.originalIsSubscribed == null && param.isSubscribed == 1) ||
-//             (this.state.originalIsSubscribed != null && this.state.originalIsSubscribed != param.isSubscribed)
-//         ) {
-//             let type = param.isSubscribed == 1 ? 1 : 2
-//             let username = param.channelUsername
-//             username = username.replace('https://t.me/', '')
-//             username = username.replace('@', '')
-//             let subscribeParam = {
-//                 type: type,
-//                 username: username
-//             }
-
-//             // 提交
-//             axios
-//                 .post(PYHOST + '/subscribeChannel', subscribeParam)
-//                 .then(res => {
-//                     if (res.data.code === 200 && res.data.data) {
-//                         notification.success({ message: '修改订阅成功' })
-//                         // 清空originalIsSubscribed
-//                         // console.log("清空originalIsSubscribed")
-//                         // this.state.originalIsSubscribed = null
-//                         // 关闭窗口
-//                         // this.setState({
-//                         //     visible: false
-//                         // })
-//                         // 重新查询当前页
-//                         // this.props.refreshTable()
-//                     } else {
-//                         notification.success({ message: '修改订阅失败' })
-//                     }
-//                 })
-//                 .catch(err => {
-//                     notification.success({ message: '修改订阅失败' })
-//                 })
-//         }
-//     }
-
-//     handleCancel = () => {
-//         console.log('handleCancel')
-//         this.setState({
-//             visible: false
-//         })
-//     }
-
-//     handleTagClick = tagValue => {
-//         const { data } = this.state
-//         const { tag } = data
-//         if (tag) {
-//             data.tag = `${tag} ${tagValue}`
-//         } else {
-//             data.tag = tagValue
-//         }
-//         this.setState({ data })
-//     }
-
-//     queryById = id => {
-//         this.setState({ loading: true })
-//         let url = HOST + '/teacher/web/info'
-//         let param = {
-//             id: id
-//         }
-//         axios
-//             .post(url, param)
-//             .then(res => {
-//                 if (res.data.code === 200) {
-//                     console.log('查询到的id:' + res.data.data.id)
-//                     this.setState({
-//                         loading: false,
-//                         data: res.data.data,
-//                         id: res.data.data.id,
-//                         originalIsSubscribed: res.data.data.isSubscribed
-//                     })
-//                 } else {
-//                     // 这里处理一些错误信息
-//                     console.log('请求错误')
-//                 }
-//             })
-//             .catch(err => {})
-//     }
-
-//     render() {
-//         const layout = {
-//             labelCol: { span: 6 },
-//             wrapperCol: { span: 12 }
-//         }
-
-//         const { data } = this.state
-
-//         return (
-//             <>
-//                 <Modal
-//                     title='用户详情'
-//                     visible={this.state.visible}
-//                     open={this.showModal}
-//                     onOk={this.handleOk}
-//                     onCancel={this.handleCancel}
-//                     destroyOnClose={true}
-//                     okText='保存'
-//                     cancelText='取消'
-//                     style={{ top: 10, left: 20, right: 20, bottom: 10 }}>
-//                     <Form {...layout} ref={this.formRef}>
-//                         <Form.Item label='ID' name='id' className='form-item'>
-//                             <Input value={this.state.data.id} disabled />
-//                         </Form.Item>
-//                         <Form.Item label='名字' name='nickname' className='form-item'>
-//                             <AutoComplete
-//                                 value={this.state.data.nickname}
-//                                 onChange={value => this.handleChange('nickname', value)}>
-//                                 {this.state.candidateList.map(candidate => (
-//                                     <AutoComplete.Option
-//                                         key={candidate.id}
-//                                         value={candidate.id + ':' + candidate.nickname}
-//                                         label={candidate.nickname}
-//                                         onClick={() => this.handleNicknameSelection(candidate)}>
-//                                         {candidate.nickname}
-//                                     </AutoComplete.Option>
-//                                 ))}
-//                             </AutoComplete>
-//                         </Form.Item>
-//                         <Form.Item label='用户名' name='username' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.username}
-//                                 onChange={e => this.handleChange('username', e.target.value)}
-//                             />
-//                         </Form.Item>
-//                         <Form.Item label='频道地址' name='channelUsername' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.channelUsername}
-//                                 onChange={e => this.handleChange('channelUsername', e.target.value)}
-//                             />
-//                         </Form.Item>
-//                         <Form.Item label='p价格' name='priceP' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.priceP}
-//                                 onChange={e => this.handleChange('priceP', e.target.value)}
-//                             />
-//                         </Form.Item>
-//                         <Form.Item label='pp价格' name='pricePp' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.pricePp}
-//                                 onChange={e => this.handleChange('pricePp', e.target.value)}
-//                             />
-//                         </Form.Item>
-//                         <Form.Item label='地区' name='region' className='form-item'>
-//                             <Select
-//                                 value={this.state.data.region}
-//                                 onChange={value => this.handleChange('region', value)}>
-//                                 {regionOptions.map(option => (
-//                                     <Select.Option key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Select.Option>
-//                                 ))}
-//                             </Select>
-//                         </Form.Item>
-//                         <Form.Item label='年龄' name='age' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.age}
-//                                 onChange={e => this.handleChange('age', e.target.value)}
-//                             />
-//                         </Form.Item>
-//                         <Form.Item label='身高' name='height' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.height}
-//                                 onChange={e => this.handleChange('height', e.target.value)}
-//                             />
-//                         </Form.Item>
-//                         <Form.Item label='体重' name='weight' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.weight}
-//                                 onChange={e => this.handleChange('weight', e.target.value)}
-//                             />
-//                         </Form.Item>
-//                         <Form.Item label='有无kiss' name='kissType' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.kissType}
-//                                 onChange={e => this.handleChange('kissType', e.target.value)}>
-//                                 {kissTypeOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                         <Form.Item label='有无69' name='isSn' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.isSn}
-//                                 onChange={e => this.handleChange('isSn', e.target.value)}>
-//                                 {haveNotOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                         <Form.Item label='有无JK' name='isJk' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.isJk}
-//                                 onChange={e => this.handleChange('isJk', e.target.value)}>
-//                                 {haveNotOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                         <Form.Item label='有无Lolita' name='isLolita' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.isLolita}
-//                                 onChange={e => this.handleChange('isLolita', e.target.value)}>
-//                                 {haveNotOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                         <Form.Item label='是否自聊' name='isIndividual' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.isIndividual}
-//                                 onChange={e => this.handleChange('isIndividual', e.target.value)}>
-//                                 {ifNotOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                         <Form.Item label='是否多地' name='isMultiCity' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.isMultiCity}
-//                                 onChange={e => this.handleChange('isMultiCity', e.target.value)}>
-//                                 {ifNotOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                         <Form.Item label='是否订阅' name='isSubscribed' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.isSubscribed}
-//                                 onChange={e => this.handleChange('isSubscribed', e.target.value)}>
-//                                 {ifNotOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                         <Form.Item label='标签' name='tag' className='form-item'>
-//                             <div>
-//                                 <Input
-//                                     value={data.tag}
-//                                     onChange={e => this.handleChange('tag', e.target.value)}
-//                                     placeholder='输入标签'
-//                                 />
-//                                 {/* <div style={{ marginTop: '8px' }}>
-//                                     {tagOptions.map(option => (
-//                                         <Tag
-//                                             key={option.value}
-//                                             onClick={() => this.handleTagClick(option.value)}
-//                                             style={{ cursor: 'pointer' }}>
-//                                             {option.label}
-//                                         </Tag>
-//                                     ))}
-//                                 </div> */}
-//                             </div>
-//                         </Form.Item>
-//                         <Form.Item label='备注' name='remark' className='form-item'>
-//                             <Input
-//                                 value={this.state.data.remark}
-//                                 onChange={e => this.handleChange('remark', e.target.value)}
-//                             />
-//                         </Form.Item>
-
-//                         <Form.Item label='老师状态' name='teacherStatus' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.teacherStatus}
-//                                 onChange={e => this.handleChange('teacherStatus', e.target.value)}>
-//                                 {teacherStatusOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-
-//                         <Form.Item label='状态' name='accountStatus' className='form-item'>
-//                             <Radio.Group
-//                                 value={this.state.data.accountStatus}
-//                                 onChange={e => this.handleChange('accountStatus', e.target.value)}>
-//                                 {accountStatusOption.map(option => (
-//                                     <Radio key={option.value} value={option.value}>
-//                                         {option.label}
-//                                     </Radio>
-//                                 ))}
-//                             </Radio.Group>
-//                         </Form.Item>
-//                     </Form>
-//                 </Modal>
-//             </>
-//         )
-//     }
-// }
 
 const TeacherView = () => {
     return <Root />

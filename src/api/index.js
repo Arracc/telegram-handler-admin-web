@@ -7,7 +7,7 @@ import { createHashHistory } from 'history'
 const history = createHashHistory()
 
 const instance = axios.create({
-    timeout: 5000
+    timeout: 20000
 })
 
 // 设置post请求头
