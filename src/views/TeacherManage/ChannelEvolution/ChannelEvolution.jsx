@@ -105,32 +105,24 @@ class Root extends Component {
     state = {
         id: 0,
         search: {
-            nickname: null,
-            username: null,
-            region: null,
-            priceGe: null,
-            priceLe: null,
-            ageGe: null,
-            ageLe: null,
-            heightGe: null,
-            heightLe: null,
-            teacherStatus: null,
-            accountStatus: null,
-            lastSeen: null,
-            sortType: null,
-            tag: null
+            type: null,
+            sortType: null
+            // nickname: null,
+            // username: null,
+            // region: null,
+            // priceGe: null,
+            // priceLe: null,
+            // ageGe: null,
+            // ageLe: null,
+            // heightGe: null,
+            // heightLe: null,
+            // teacherStatus: null,
+            // accountStatus: null,
+            // lastSeen: null,
+            // sortType: null,
+            // tag: null
         }
     }
-
-    // showInfoCard(id) {
-    //     if (id != null && id != 0) {
-    //         this.setState({
-    //             id: id
-    //         })
-    //     }
-    //     调用InfoCardModal的显示方法
-    //     this.InfoCardModal.showModal(id)
-    // }
 
     handleChange = (fieldName, value) => {
         const { search } = this.state
@@ -138,20 +130,28 @@ class Root extends Component {
         this.setState({ search })
     }
 
-    handleSearch = () => {
+    // handleSearch = () => {
+    //     const { search } = this.state
+    //     // const { pagination } = this.TeacherTable.state
+    //     // const { current, pageSize } = pagination
+    //     console.log(search)
+    //     this.TeacherTable.queryPage(1, this.TeacherTable.state.pagination.size, search)
+    // }
+
+    handleTabPageChange = (type) => {
+        console.log('切换标签页')
         const { search } = this.state
-        // const { pagination } = this.TeacherTable.state
-        // const { current, pageSize } = pagination
-        console.log(search)
-        this.TeacherTable.queryPage(1, this.TeacherTable.state.pagination.size, search)
+        search['type'] = type
+        this.setState({ search })
+        this.ChannelEvolutionTable.queryPage(
+            search
+        )
     }
 
     refreshTable = () => {
         console.log('root触发刷新')
         const { search } = this.state
-        this.TeacherTable.queryPage(
-            this.TeacherTable.state.pagination.current,
-            this.TeacherTable.state.pagination.size,
+        this.ChannelEvolutionTable.queryPage(
             search
         )
     }
@@ -172,239 +172,16 @@ class Root extends Component {
                 <Row>
                     <Col>
                         <div className='base-style' style={{ width: '100%' }}>
-                            {/* <SearchBar /> */}
-                            {/* <div className='base-style' style={{ display: 'inline-block' }}>
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    名字：
-                                    <Input
-                                        style={{ width: '150px' }}
-                                        onChange={e => this.handleChange('nickname', e.target.value)}
-                                    />
-                                </span>
 
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    用户名：
-                                    <Input
-                                        style={{ width: '150px' }}
-                                        onChange={e => this.handleChange('username', e.target.value)}
-                                    />
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    标签：
-                                    <Input
-                                        style={{ width: '150px' }}
-                                        onChange={e => this.handleChange('tag', e.target.value)}
-                                    />
-                                </span>
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    价格：
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('priceGe', e.target.value)}
-                                    />
-                                    &nbsp;-&nbsp;
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('priceLe', e.target.value)}
-                                    />
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    年龄：
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('ageGe', e.target.value)}
-                                    />
-                                    &nbsp;-&nbsp;
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('ageLe', e.target.value)}
-                                    />
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    身高：
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('heightGe', e.target.value)}
-                                    />
-                                    &nbsp;-&nbsp;
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('heightLe', e.target.value)}
-                                    />
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    体重：
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('weightGe', e.target.value)}
-                                    />
-                                    &nbsp;-&nbsp;
-                                    <Input
-                                        style={{ width: '50px' }}
-                                        onChange={e => this.handleChange('weightLe', e.target.value)}
-                                    />
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    地区：
-                                    <Select
-                                        style={{ width: '80px' }}
-                                        onChange={value => this.handleChange('region', value)}>
-                                        {regionOptions.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    kiss：
-                                    <Select
-                                        style={{ width: '150px' }}
-                                        mode='multiple' // 设置为多选模式
-                                        onChange={values => this.handleChange('kissType', values)} // 注意这里的values是一个数组
-                                    >
-                                        <Select.Option key='empty' value=''>
-                                        </Select.Option>
-                                        {kissTypeOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    69：
-                                    <Select
-                                        style={{ width: '50px' }}
-                                        onChange={value => this.handleChange('isSn', value)}>
-                                        {haveNotOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    JK：
-                                    <Select
-                                        style={{ width: '50px' }}
-                                        onChange={value => this.handleChange('isJk', value)}>
-                                        {haveNotOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    Lolita：
-                                    <Select
-                                        style={{ width: '50px' }}
-                                        onChange={value => this.handleChange('isLolita', value)}>
-                                        {haveNotOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    自聊：
-                                    <Select
-                                        style={{ width: '50px' }}
-                                        onChange={value => this.handleChange('isIndividual', value)}>
-                                        {ifNotOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    订阅：
-                                    <Select
-                                        style={{ width: '50px' }}
-                                        onChange={value => this.handleChange('isSubscribed', value)}>
-                                        {ifNotOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    老师状态：
-                                    <Select
-                                        style={{ width: '160px' }}
-                                        mode='multiple' // 设置为多选模式
-                                        onChange={values => this.handleChange('teacherStatus', values)} // 注意这里的values是一个数组
-                                    >
-                                        <Select.Option key='empty' value=''>
-                                        </Select.Option>
-                                        {teacherStatusOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    账号状态：
-                                    <Select
-                                        style={{ width: '160px' }}
-                                        mode='multiple' // 设置为多选模式
-                                        onChange={values => this.handleChange('accountStatus', values)} // 注意这里的values是一个数组
-                                    >
-                                        <Select.Option key='empty' value=''>
-                                        </Select.Option>
-                                        {accountStatusOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
-                                    最后在线：
-                                    <Select
-                                        style={{ width: '160px' }}
-                                        mode='multiple' // 设置为多选模式
-                                        onChange={values => this.handleChange('lastSeen', values)} // 注意这里的values是一个数组
-                                    >
-                                        <Select.Option key='empty' value=''>
-                                        </Select.Option>
-                                        {lastSeenOption.map(option => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </span>
-
-                                <span style={{ display: 'inline-block' }}>
-                                    <Button onClick={this.handleSearch}>查找</Button>
-                                </span>
+                            {/* Add tab buttons here */}
+                            <div style={{ marginBottom: '16px' }}>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(0)}>全部</Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(1)}>800</Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(2)}>1000</Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(3)}>1200</Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(4)}>1500</Button>
+                                <Button onClick={() => this.handleTabPageChange(5)}>无上限</Button>
                             </div>
-
-                            <div>
-                                <Button type='button' onClick={() => this.showInfoCard(0)}>
-                                    新增
-                                </Button>
-                            </div> */}
 
                             {/* <Divider /> */}
 
@@ -421,7 +198,6 @@ class Root extends Component {
                     </Col>
                 </Row>
 
-                {/* <InfoCardModal ref={node => (this.InfoCardModal = node)} refreshTable={() => this.refreshTable()} /> */}
             </Layout>
         )
     }
@@ -553,11 +329,12 @@ class ChannelEvolutionTable extends Component {
     //         .catch(err => {})
     // }
     queryPage = filters => {
-        this.setState({ loading: true })
+        const { type } = filters || { type: 0 }; // Using destructuring assignment with default value
+        this.setState({ loading: true });
         let url = HOST + '/channelEvolution/list'
-        let param = {}
+        let params = { type: type }; // Assuming 'filters' contains the necessary parameters
         axios
-            .post(url, param)
+            .get(url, { params })
             .then(res => {
                 if (res.data.code === 200) {
                     // const pagination = { ...this.state.pagination }
@@ -574,7 +351,9 @@ class ChannelEvolutionTable extends Component {
                     console.log('请求错误')
                 }
             })
-            .catch(err => {})
+            .catch(err => {
+                console.error('请求失败', err);
+            })
     }
 
     // 渲染数据
@@ -617,10 +396,10 @@ class ChannelEvolutionTable extends Component {
                     dataSource={processedData}
                     onChange={this.handleTableChange}
                     pagination={false}
-                    // pagination={{
-                    //     ...pagination,
-                    //     itemRender: renderPagination
-                    // }}
+                // pagination={{
+                //     ...pagination,
+                //     itemRender: renderPagination
+                // }}
                 />
             </div>
         )

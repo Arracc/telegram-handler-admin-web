@@ -262,6 +262,19 @@ class Root extends Component {
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    科技：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isAugmented', value)}>
+                                        {ifNotOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     地区：
                                     <Select
                                         style={{ width: '80px' }}
@@ -349,6 +362,19 @@ class Root extends Component {
                                     <Select
                                         style={{ width: '50px' }}
                                         onChange={value => this.handleChange('isSubscribed', value)}>
+                                        {ifNotOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    评价负面：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isReviewNegative', value)}>
                                         {ifNotOption.map(option => (
                                             <Select.Option key={option.value} value={option.value}>
                                                 {option.label}
@@ -739,6 +765,18 @@ class TeacherTable extends Component {
             sorter: true
         },
         {
+            title: '科技',
+            dataIndex: 'isAugmented',
+            key: 'isAugmented',
+            render: val => {
+                const selectedOption = commonShowOption.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
             title: 'kiss',
             dataIndex: 'kissType',
             key: 'kissType',
@@ -786,6 +824,17 @@ class TeacherTable extends Component {
             title: '自聊',
             dataIndex: 'isIndividual',
             key: 'isIndividual',
+            render: val => {
+                const selectedOption = commonShowOption2.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
+            title: '评价负面',
+            dataIndex: 'isReviewNegative',
+            key: 'isReviewNegative',
             render: val => {
                 const selectedOption = commonShowOption2.find(option => option.value === val)
                 return selectedOption ? selectedOption.label : ''
@@ -1123,6 +1172,10 @@ class InfoCardModal extends Component {
             param.cup = this.state.data.cup
         }
 
+        if (this.state.data.isAugmented !== undefined && this.state.data.isAugmented !== null) {
+            param.isAugmented = this.state.data.isAugmented
+        }
+
         if (this.state.data.kissType !== undefined && this.state.data.kissType !== null) {
             param.kissType = this.state.data.kissType
         }
@@ -1149,6 +1202,10 @@ class InfoCardModal extends Component {
 
         if (this.state.data.isSubscribed != undefined) {
             param.isSubscribed = this.state.data.isSubscribed
+        }
+
+        if (this.state.data.isReviewNegative != undefined) {
+            param.isReviewNegative = this.state.data.isReviewNegative
         }
 
         if (this.state.data.teacherStatus != undefined) {
@@ -1362,6 +1419,17 @@ class InfoCardModal extends Component {
                                 onChange={e => this.handleChange('cup', e.target.value)}
                             />
                         </Form.Item>
+                        <Form.Item label='科技' name='isAugmented' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isAugmented}
+                                onChange={e => this.handleChange('isAugmented', e.target.value)}>
+                                {ifNotOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
                         <Form.Item label='有无kiss' name='kissType' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.kissType}
@@ -1432,6 +1500,17 @@ class InfoCardModal extends Component {
                             <Radio.Group
                                 value={this.state.data.isSubscribed}
                                 onChange={e => this.handleChange('isSubscribed', e.target.value)}>
+                                {ifNotOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
+                        <Form.Item label='是否评价负面' name='isReviewNegative' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isReviewNegative}
+                                onChange={e => this.handleChange('isReviewNegative', e.target.value)}>
                                 {ifNotOption.map(option => (
                                     <Radio key={option.value} value={option.value}>
                                         {option.label}
