@@ -384,6 +384,19 @@ class Root extends Component {
                                 </span>
 
                                 <span style={{ display: 'inline-block', margin: '0 10px' }}>
+                                    数据造假：
+                                    <Select
+                                        style={{ width: '50px' }}
+                                        onChange={value => this.handleChange('isCheat', value)}>
+                                        {ifNotOption.map(option => (
+                                            <Select.Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </span>
+
+                                <span style={{ display: 'inline-block', margin: '0 10px' }}>
                                     老师状态：
                                     <Select
                                         style={{ width: '160px' }}
@@ -843,6 +856,17 @@ class TeacherTable extends Component {
             resizable: true // 允许调节列宽
         },
         {
+            title: '数据造假',
+            dataIndex: 'isCheat',
+            key: 'isCheat',
+            render: val => {
+                const selectedOption = commonShowOption2.find(option => option.value === val)
+                return selectedOption ? selectedOption.label : ''
+            },
+            align: 'center',
+            resizable: true // 允许调节列宽
+        },
+        {
             title: '订阅',
             dataIndex: 'isSubscribed',
             key: 'isSubscribed',
@@ -1141,6 +1165,8 @@ class InfoCardModal extends Component {
             isIndividual: this.state.data.isIndividual || 0,
             isMultiCity: this.state.data.isMultiCity || 0,
             isSubscribed: this.state.data.isSubscribed || 0,
+            isReviewNegative: this.state.data.isReviewNegative || 0,
+            isCheat: this.state.data.isCheat || 0,
             tag: this.state.data.tag || '',
             remark: this.state.data.remark || ''
         }
@@ -1206,6 +1232,10 @@ class InfoCardModal extends Component {
 
         if (this.state.data.isReviewNegative != undefined) {
             param.isReviewNegative = this.state.data.isReviewNegative
+        }
+
+        if (this.state.data.isCheat != undefined) {
+            param.isCheat = this.state.data.isCheat
         }
 
         if (this.state.data.teacherStatus != undefined) {
@@ -1452,7 +1482,7 @@ class InfoCardModal extends Component {
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-                        <Form.Item label='有无JK' name='isJk' className='form-item'>
+                        {/* <Form.Item label='有无JK' name='isJk' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isJk}
                                 onChange={e => this.handleChange('isJk', e.target.value)}>
@@ -1473,8 +1503,8 @@ class InfoCardModal extends Component {
                                     </Radio>
                                 ))}
                             </Radio.Group>
-                        </Form.Item>
-                        <Form.Item label='是否自聊' name='isIndividual' className='form-item'>
+                        </Form.Item> */}
+                        <Form.Item label='自聊' name='isIndividual' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isIndividual}
                                 onChange={e => this.handleChange('isIndividual', e.target.value)}>
@@ -1485,7 +1515,7 @@ class InfoCardModal extends Component {
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-                        <Form.Item label='是否多地' name='isMultiCity' className='form-item'>
+                        <Form.Item label='多地' name='isMultiCity' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isMultiCity}
                                 onChange={e => this.handleChange('isMultiCity', e.target.value)}>
@@ -1496,7 +1526,7 @@ class InfoCardModal extends Component {
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-                        <Form.Item label='是否订阅' name='isSubscribed' className='form-item'>
+                        <Form.Item label='订阅' name='isSubscribed' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isSubscribed}
                                 onChange={e => this.handleChange('isSubscribed', e.target.value)}>
@@ -1507,10 +1537,21 @@ class InfoCardModal extends Component {
                                 ))}
                             </Radio.Group>
                         </Form.Item>
-                        <Form.Item label='是否评价负面' name='isReviewNegative' className='form-item'>
+                        <Form.Item label='评价负面' name='isReviewNegative' className='form-item'>
                             <Radio.Group
                                 value={this.state.data.isReviewNegative}
                                 onChange={e => this.handleChange('isReviewNegative', e.target.value)}>
+                                {ifNotOption.map(option => (
+                                    <Radio key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Radio>
+                                ))}
+                            </Radio.Group>
+                        </Form.Item>
+                        <Form.Item label='数据造假' name='isCheat' className='form-item'>
+                            <Radio.Group
+                                value={this.state.data.isCheat}
+                                onChange={e => this.handleChange('isCheat', e.target.value)}>
                                 {ifNotOption.map(option => (
                                     <Radio key={option.value} value={option.value}>
                                         {option.label}

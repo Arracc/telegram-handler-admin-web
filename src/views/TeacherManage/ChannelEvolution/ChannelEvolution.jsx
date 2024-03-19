@@ -105,7 +105,9 @@ class Root extends Component {
     state = {
         id: 0,
         search: {
-            type: null,
+            group: null,
+            year: null,
+            week: null,
             sortType: null
             // nickname: null,
             // username: null,
@@ -138,22 +140,18 @@ class Root extends Component {
     //     this.TeacherTable.queryPage(1, this.TeacherTable.state.pagination.size, search)
     // }
 
-    handleTabPageChange = (type) => {
+    handleTabPageChange = group => {
         console.log('切换标签页')
         const { search } = this.state
-        search['type'] = type
+        search['group'] = group
         this.setState({ search })
-        this.ChannelEvolutionTable.queryPage(
-            search
-        )
+        this.ChannelEvolutionTable.queryPage(search)
     }
 
     refreshTable = () => {
         console.log('root触发刷新')
         const { search } = this.state
-        this.ChannelEvolutionTable.queryPage(
-            search
-        )
+        this.ChannelEvolutionTable.queryPage(search)
     }
 
     changeStateSortBy = value => {
@@ -163,7 +161,46 @@ class Root extends Component {
         this.setState({ search })
     }
 
+    handleYearChange = value => {
+        console.log('year:' + value)
+        const { search } = this.state
+        search['year'] = value
+        this.setState({ search })
+        console.log('参数：' + JSON.stringify(search))
+        if ((search.year != null && search.week != null) || (search.year == null && search.week == null)) {
+            this.ChannelEvolutionTable.queryPage(search)
+        }
+    }
+
+    handleWeekChange = value => {
+        console.log('week:' + value)
+        const { search } = this.state
+        search['week'] = value
+        this.setState({ search })
+        console.log('参数：' + JSON.stringify(search))
+        if ((search.year != null && search.week != null) || (search.year == null && search.week == null)) {
+            this.ChannelEvolutionTable.queryPage(search)
+        }
+    }
+
+    handleResetDate = () => {
+        const { search } = this.state
+        search['year'] = null
+        search['week'] = null
+        this.setState({ search })
+        this.ChannelEvolutionTable.queryPage(search)
+    }
+
     render() {
+        const years = [
+            { value: null, label: ' ' },
+            { value: 2024, label: '2024' }
+        ] // 假设年份信息存在数组中
+        const weeks = [{ value: null, label: ' ' }]
+        for (let i = 1; i <= 52; i++) {
+            weeks.push({ value: i, label: i.toString() })
+        }
+
         return (
             <Layout className='animated fadeIn'>
                 <div>
@@ -172,15 +209,53 @@ class Root extends Component {
                 <Row>
                     <Col>
                         <div className='base-style' style={{ width: '100%' }}>
-
                             {/* Add tab buttons here */}
                             <div style={{ marginBottom: '16px' }}>
-                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(0)}>全部</Button>
-                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(1)}>800</Button>
-                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(2)}>1000</Button>
-                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(3)}>1200</Button>
-                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(4)}>1500</Button>
-                                <Button onClick={() => this.handleTabPageChange(5)}>无上限</Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(0)}>
+                                    全部
+                                </Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(1)}>
+                                    800
+                                </Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(2)}>
+                                    1000
+                                </Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(3)}>
+                                    1200
+                                </Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(4)}>
+                                    1500
+                                </Button>
+                                <Button style={{ marginRight: '8px' }} onClick={() => this.handleTabPageChange(5)}>
+                                    无上限
+                                </Button>
+                                <Select
+                                    value={this.state.search.year}
+                                    onChange={this.handleYearChange}
+                                    placeholder='Select Year'
+                                    style={{ width: '120px' }} // 调整下拉框宽度
+                                >
+                                    {years.map(year => (
+                                        <Select.Option key={year.value} value={year.value}>
+                                            {year.label}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+
+                                <Select
+                                    value={this.state.search.week}
+                                    onChange={this.handleWeekChange}
+                                    placeholder='Select Week'
+                                    style={{ width: '120px' }} // 调整下拉框宽度
+                                >
+                                    {weeks.map(week => (
+                                        <Select.Option key={week.value} value={week.value}>
+                                            {week.label}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+
+                                <Button onClick={this.handleResetDate}>重置日期</Button>
                             </div>
 
                             {/* <Divider /> */}
@@ -197,7 +272,6 @@ class Root extends Component {
                         </div>
                     </Col>
                 </Row>
-
             </Layout>
         )
     }
@@ -300,12 +374,22 @@ class ChannelEvolutionTable extends Component {
     }
 
     queryPage = filters => {
-        const { type } = filters || { type: 0 }; // Using destructuring assignment with default value
-        this.setState({ loading: true });
+        console.log('queryPage:' + JSON.stringify(filters))
+        // 确保 filters 被定义
+        let params = filters || { group: 0 }
+
+        // 在修改 params 前检查 year 或 week 是否为 null
+        if (params.year == null || params.week == null) {
+            params.year = null
+            params.week = null
+        }
+
+        console.log('queryPage params:' + JSON.stringify(params))
+
+        this.setState({ loading: true })
         let url = HOST + '/channelEvolution/list'
-        let params = { type: type }; // Assuming 'filters' contains the necessary parameters
         axios
-            .get(url, { params })
+            .post(url, params)
             .then(res => {
                 if (res.data.code === 200) {
                     // const pagination = { ...this.state.pagination }
@@ -323,13 +407,12 @@ class ChannelEvolutionTable extends Component {
                 }
             })
             .catch(err => {
-                console.error('请求失败', err);
+                console.error('请求失败', err)
             })
     }
 
     // 渲染数据
     render() {
-        // const { data, pagination } = this.state
         const { data } = this.state
 
         const processedData = data.map((item, index) => ({
@@ -367,10 +450,6 @@ class ChannelEvolutionTable extends Component {
                     dataSource={processedData}
                     onChange={this.handleTableChange}
                     pagination={false}
-                // pagination={{
-                //     ...pagination,
-                //     itemRender: renderPagination
-                // }}
                 />
             </div>
         )
@@ -499,9 +578,9 @@ class ChannelEvolutionTable extends Component {
             resizable: true,
             sorter: true,
             render: text => {
-                const date = new Date(text);
-                const formattedTime = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`; // 加1是因为getMonth()返回的月份是从0开始计数的
-                return <span>{formattedTime}</span>;
+                const date = new Date(text)
+                const formattedTime = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}` // 加1是因为getMonth()返回的月份是从0开始计数的
+                return <span>{formattedTime}</span>
             }
         },
         {
@@ -656,7 +735,6 @@ class ChannelEvolutionTable extends Component {
         //     resizable: true // 允许调节列宽
         // },
     ]
-
 }
 
 const TeacherView = () => {
