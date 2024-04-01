@@ -103,7 +103,6 @@ for (let age = 18; age <= 30; age++) {
 
 class Root extends Component {
     state = {
-        id: 0,
         search: {
             group: null,
             year: null,
@@ -191,6 +190,66 @@ class Root extends Component {
         this.ChannelEvolutionTable.queryPage(search)
     }
 
+    handleDownload = () => {
+        const group = this.state.search.group;
+        const year = this.state.search.year;
+        const week = this.state.search.week;
+
+        // 检查参数是否缺失
+        if (group === null || year === null || week === null) {
+            alert("参数缺失");
+            return; // 终止函数执行
+        }
+
+        // 构建带参数的 URL
+        let url = `${HOST}/channelEvolution/downloadExcel?group=${group}&year=${year}&week=${week}`;
+
+        // 发送 GET 请求
+        axios
+            .get(url, {
+                responseType: 'blob', // 声明响应类型为 Blob
+                // 使用原始响应头
+                headers: {
+                    'Access-Control-Expose-Headers': 'Content-Disposition'
+                }
+            })
+            .then(res => {
+                if (res.data) {
+                    // 获取文件名
+                    let filename = 'download.xlsx';
+                    const contentDisposition = res.headers["content-disposition"];
+                    if (contentDisposition) {
+                        const filenameStartIndex = contentDisposition.indexOf("filename=");
+                        if (filenameStartIndex !== -1) {
+                            filename = contentDisposition.substring(filenameStartIndex + 9).trim();
+                        }
+                    }
+
+                    // 创建 Blob URL
+                    const blobUrl = URL.createObjectURL(new Blob([res.data]));
+
+                    // 创建隐藏的 <a> 元素并设置链接
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename; // 设置文件名
+                    document.body.appendChild(a);
+
+                    // 触发下载
+                    a.click();
+
+                    // 释放资源
+                    window.URL.revokeObjectURL(blobUrl);
+                    document.body.removeChild(a);
+                } else {
+                    console.log('未收到有效数据');
+                }
+            })
+            .catch(err => {
+                // 请求失败
+                console.error('请求失败', err);
+            });
+    }
+
     render() {
         const years = [
             { value: null, label: ' ' },
@@ -233,7 +292,7 @@ class Root extends Component {
                                     value={this.state.search.year}
                                     onChange={this.handleYearChange}
                                     placeholder='Select Year'
-                                    style={{ width: '120px' }} // 调整下拉框宽度
+                                    style={{ width: '120px', marginRight: '8px' }} // 调整下拉框宽度
                                 >
                                     {years.map(year => (
                                         <Select.Option key={year.value} value={year.value}>
@@ -246,7 +305,7 @@ class Root extends Component {
                                     value={this.state.search.week}
                                     onChange={this.handleWeekChange}
                                     placeholder='Select Week'
-                                    style={{ width: '120px' }} // 调整下拉框宽度
+                                    style={{ width: '120px', marginRight: '8px' }} // 调整下拉框宽度
                                 >
                                     {weeks.map(week => (
                                         <Select.Option key={week.value} value={week.value}>
@@ -255,7 +314,10 @@ class Root extends Component {
                                     ))}
                                 </Select>
 
-                                <Button onClick={this.handleResetDate}>重置日期</Button>
+                                <Button style={{ marginRight: '8px' }} onClick={this.handleResetDate}>重置日期</Button>
+
+                                <Button onClick={this.handleDownload}>下载</Button>
+
                             </div>
 
                             {/* <Divider /> */}
@@ -420,28 +482,6 @@ class ChannelEvolutionTable extends Component {
             index: index + 1 // 自动计算序号，从1开始递增
         }))
 
-        // const renderPagination = (page, type, originalElement) => {
-        //     if (type === 'prev') {
-        //         return (
-        //             <div style={{ display: 'flex', alignItems: 'center' }}>
-        //                 共<span>{this.state.pagination.total}</span>
-        //                 条， 每页显示记录数：
-        //                 <Select
-        //                     defaultValue={pagination.pageSize}
-        //                     onChange={this.handlePageSizeChange}
-        //                     style={{ width: '80px', marginRight: '8px' }}>
-        //                     <Option value='10'>10</Option>
-        //                     <Option value='20'>20</Option>
-        //                     <Option value='50'>50</Option>
-        //                     <Option value='100'>100</Option>
-        //                 </Select>
-        //                 <div style={{ width: '30px' }}>{originalElement}</div>
-        //             </div>
-        //         )
-        //     }
-        //     return originalElement
-        // }
-
         return (
             <div style={{ position: 'relative' }}>
                 <Table
@@ -483,6 +523,30 @@ class ChannelEvolutionTable extends Component {
             key: 'priceStr',
             align: 'center',
             resizable: true, // 允许调节列宽
+            sorter: true
+        },
+        {
+            title: '访问量',
+            dataIndex: 'channel1dViews',
+            key: 'channel1dViews',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '订阅数',
+            dataIndex: 'channelMembers',
+            key: 'channelMembers',
+            align: 'center',
+            resizable: true,
+            sorter: true
+        },
+        {
+            title: '排名变化',
+            dataIndex: 'rankChanged',
+            key: 'rankChanged',
+            align: 'center',
+            resizable: true,
             sorter: true
         },
         {
@@ -529,46 +593,6 @@ class ChannelEvolutionTable extends Component {
             },
             align: 'center',
             resizable: true // 允许调节列宽
-        },
-        {
-            title: '访问量',
-            dataIndex: 'channel1dViews',
-            key: 'channel1dViews',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
-        {
-            title: '订阅数',
-            dataIndex: 'channelMembers',
-            key: 'channelMembers',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
-        {
-            title: '排名变化',
-            dataIndex: 'rankChanged',
-            key: 'rankChanged',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
-        {
-            title: '排名变化',
-            dataIndex: 'rankChangedStr',
-            key: 'rankChangedStr',
-            align: 'center',
-            resizable: true,
-            sorter: true
-        },
-        {
-            title: '变化方向',
-            dataIndex: 'rankMovement',
-            key: 'rankMovement',
-            align: 'center',
-            resizable: true,
-            sorter: true
         },
         {
             title: '开课时间',
@@ -652,41 +676,6 @@ class ChannelEvolutionTable extends Component {
                 </Tooltip>
             )
         },
-
-        {
-            title: 'JK',
-            dataIndex: 'isJk',
-            key: 'isJk',
-            render: val => {
-                const selectedOption = commonShowOption.find(option => option.value === val)
-                return selectedOption ? selectedOption.label : ''
-            },
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
-        {
-            title: 'Lolita',
-            dataIndex: 'isLolita',
-            key: 'isLolita',
-            render: val => {
-                const selectedOption = commonShowOption.find(option => option.value === val)
-                return selectedOption ? selectedOption.label : ''
-            },
-            align: 'center',
-            resizable: true // 允许调节列宽
-        },
-
-        // {
-        //     title: '订阅',
-        //     dataIndex: 'isSubscribed',
-        //     key: 'isSubscribed',
-        //     render: val => {
-        //         const selectedOption = commonShowOption2.find(option => option.value === val)
-        //         return selectedOption ? selectedOption.label : ''
-        //     },
-        //     align: 'center',
-        //     resizable: true // 允许调节列宽
-        // },
         {
             title: '标签',
             dataIndex: 'tag',
@@ -694,46 +683,6 @@ class ChannelEvolutionTable extends Component {
             align: 'center',
             resizable: true // 允许调节列宽
         }
-        // {
-        //     title: '备注',
-        //     dataIndex: 'remark',
-        //     key: 'remark',
-        //     align: 'center',
-        //     resizable: true // 允许调节列宽
-        // },
-        // {
-        //     title: '老师状态',
-        //     dataIndex: 'teacherStatus',
-        //     key: 'teacherStatus',
-        //     render: val => {
-        //         const selectedOption = teacherStatusOption.find(option => option.value === val)
-        //         return selectedOption ? selectedOption.label : ''
-        //     },
-        //     align: 'center',
-        //     resizable: true // 允许调节列宽
-        // },
-        // {
-        //     title: '账号状态',
-        //     dataIndex: 'accountStatus',
-        //     key: 'accountStatus',
-        //     render: val => {
-        //         const selectedOption = accountStatusOption.find(option => option.value === val)
-        //         return selectedOption ? selectedOption.label : ''
-        //     },
-        //     align: 'center',
-        //     resizable: true // 允许调节列宽
-        // },
-        // {
-        //     title: '最近上线',
-        //     dataIndex: 'lastSeen',
-        //     key: 'lastSeen',
-        //     render: val => {
-        //         const selectedOption = lastSeenOption.find(option => option.value === val)
-        //         return selectedOption ? selectedOption.label : ''
-        //     },
-        //     align: 'center',
-        //     resizable: true // 允许调节列宽
-        // },
     ]
 }
 

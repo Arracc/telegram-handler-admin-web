@@ -658,6 +658,7 @@ class TeacherTable extends Component {
                         ...pagination,
                         itemRender: renderPagination
                     }}
+                    scroll={{ x: true }}
                 />
             </div>
         )
@@ -669,6 +670,8 @@ class TeacherTable extends Component {
             dataIndex: 'index',
             key: 'index',
             align: 'center',
+            fixed: 'left',
+            width: 60, // 设定固定列的宽度
             resizable: true // 允许调节列宽
         },
         {
@@ -676,6 +679,8 @@ class TeacherTable extends Component {
             dataIndex: 'nickname',
             key: 'nickname',
             align: 'center',
+            fixed: 'left',
+            width: 80, // 设定固定列的宽度
             resizable: true // 允许调节列宽
         },
         {
